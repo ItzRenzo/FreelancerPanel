@@ -1,0 +1,39 @@
+/* General ScrollPane Styling */
+.scroll-pane {
+    -fx-background: #101010; /* Background for the ScrollPane */
+    -fx-border-color: transparent; /* Remove border */
+    -fx-padding: 0; /* Remove padding */
+}
+
+/* Styling the ScrollBar */
+.scroll-pane .scroll-bar {
+    -fx-background-color: #2b2b2b; /* Dark background for the scroll bar */
+}
+
+/* Styling the Thumb (draggable part of the scroll bar) */
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #808080; /* Default thumb color */
+    -fx-background-radius: 5px;    /* Rounded corners */
+    -fx-background-insets: 0;      /* Remove any inset space */
+}
+
+/* Hover Effect for the Thumb */
+.scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: #b3b3b3; /* Change thumb color on hover */
+}
+
+/* Vertical ScrollBar Specific Styling */
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-min-height: 10px; /* Set minimum height for vertical thumb */
+}
+
+/* Horizontal ScrollBar Specific Styling */
+.scroll-pane .scroll-bar:horizontal .thumb {
+    -fx-min-width: 10px; /* Set minimum width for horizontal thumb */
+}
+
+/* Making ScrollBar Background Transparent if Needed */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent; /* Transparent scrollbar track */
+}

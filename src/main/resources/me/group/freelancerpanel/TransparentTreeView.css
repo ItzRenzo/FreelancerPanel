@@ -1,0 +1,61 @@
+/* Make the TreeView background transparent */
+.tree-view {
+    -fx-background-color: transparent; /* Transparent background */
+    -fx-border-color: transparent;    /* Remove border */
+}
+
+/* Transparent TreeCell backgrounds */
+.tree-cell {
+    -fx-background-color: transparent; /* Remove background color for cells */
+}
+
+/* Styling for selected TreeCell to keep transparency */
+.tree-cell:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.2); /* Slight transparency for selected cells */
+    -fx-text-fill: white; /* Ensure text remains visible */
+}
+
+/* Styling for hover effect to keep transparency */
+.tree-cell:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+}
+
+/* Optional: Transparent ScrollBar styling */
+.scroll-bar {
+    -fx-background-color: transparent; /* Transparent ScrollBar */
+}
+
+/* Optional: Hide vertical and horizontal ScrollBars if not needed */
+.scroll-bar:vertical .thumb, .scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.3); /* Transparent thumb for scroll */
+    -fx-border-color: transparent;
+    -fx-border-radius: 3px;
+}
+
+.tree-cell {
+    -fx-text-fill: white;           /* Set text color to white */
+    -fx-font-family: "Century Gothic"; /* Set font family */
+    -fx-font-size: 15px;            /* Set font size */
+    -fx-font-weight: bold;          /* Set font weight to bold */
+}
+
+/* Apply to all TreeView */
+.tree-cell:filled:selected {
+    -fx-background-color: transparent;
+}
+
+/* Apply to all TreeView cells */
+.tree-cell:selected {
+    -fx-background-color: transparent;
+}
+
+/* Transparent background for TreeView items */
+.tree-cell {
+    -fx-background-color: transparent;
+}
+
+/* Optional: Transparent TreeView itself */
+.tree-view {
+    -fx-background-color: transparent;
+}
+

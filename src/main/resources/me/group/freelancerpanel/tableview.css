@@ -1,0 +1,52 @@
+/* Make the entire TableView background transparent */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Set the entire header background color */
+.table-view .column-header-background {
+    -fx-background-color: #282828;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* Set individual column headers (header cells) background color */
+.table-view .table-column-header {
+    -fx-background-color: #282828;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0; /* Removes extra padding that could cause borders */
+}
+
+/* Ensure each label within the column headers has a solid background */
+.table-view .column-header .label {
+    -fx-background-color: #282828;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+/* Make individual table rows transparent */
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Make table cells transparent */
+.table-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Remove focus border when a row is selected */
+.table-row-cell:focused {
+    -fx-background-color: transparent;
+}
+
+/* Remove background color for selected rows */
+.table-row-cell:filled:selected, .table-cell:selected {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}

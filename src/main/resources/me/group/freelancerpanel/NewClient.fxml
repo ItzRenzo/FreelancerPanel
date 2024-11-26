@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.NewCommissionController">
+   <children>
+      <AnchorPane prefHeight="63.0" prefWidth="600.0" style="-fx-background-color: #282828;">
+         <children>
+            <Text fill="WHITE" layoutX="14.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Create a new client">
+               <font>
+                  <Font name="Calibri Bold" size="18.0" />
+               </font>
+            </Text>
+            <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="551.0" layoutY="14.0" onMouseClicked="#CloseClicked" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/exit.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <Text fill="WHITE" layoutX="17.0" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:">
+         <font>
+            <Font name="Calibri Bold" size="18.0" />
+         </font>
+      </Text>
+      <TextField fx:id="NameTF" layoutX="16.0" layoutY="109.0" prefHeight="25.0" prefWidth="567.0" />
+      <TextField fx:id="DiscordTF" layoutX="17.0" layoutY="188.0" prefHeight="25.0" prefWidth="567.0" />
+      <TextField fx:id="EmailTF" layoutX="17.0" layoutY="262.0" prefHeight="25.0" prefWidth="567.0" />
+      <Text fill="WHITE" layoutX="14.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Discord Username:">
+         <font>
+            <Font name="Calibri Bold" size="18.0" />
+         </font>
+      </Text>
+      <Text fill="WHITE" layoutX="14.0" layoutY="250.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email Address:">
+         <font>
+            <Font name="Calibri Bold" size="18.0" />
+         </font>
+      </Text>
+      <AnchorPane layoutX="14.0" layoutY="351.0" onMouseClicked="#CancelClicked" prefHeight="35.0" prefWidth="90.0" style="-fx-background-color: #282828; -fx-background-radius: 10;">
+         <children>
+            <Text fill="WHITE" layoutX="19.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cancel">
+               <font>
+                  <Font name="Calibri Bold" size="18.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="493.0" layoutY="351.0" onMouseClicked="#CreateClicked" prefHeight="35.0" prefWidth="90.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 10;">
+         <children>
+            <Text layoutX="19.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Create">
+               <font>
+                  <Font name="Calibri Bold" size="18.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+   </children>
+</Pane>

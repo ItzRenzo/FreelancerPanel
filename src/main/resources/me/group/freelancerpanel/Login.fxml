@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="623.0" prefWidth="738.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.LoginController">
+   <children>
+      <Pane layoutX="244.0" layoutY="162.0" prefHeight="300.0" prefWidth="250.0" style="-fx-background-color: #232222;">
+         <children>
+            <Text fill="WHITE" layoutX="101.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Login">
+               <font>
+                  <Font name="Calibri Bold" size="22.0" />
+               </font>
+            </Text>
+            <Text fill="WHITE" layoutX="21.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" wrappingWidth="65.76953125">
+               <font>
+                  <Font name="Calibri Bold" size="15.0" />
+               </font>
+            </Text>
+            <TextField fx:id="UserTF" layoutX="21.0" layoutY="81.0" prefHeight="25.0" prefWidth="209.0" />
+            <Text fill="WHITE" layoutX="21.0" layoutY="137.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" wrappingWidth="65.76953125">
+               <font>
+                  <Font name="Calibri Bold" size="15.0" />
+               </font>
+            </Text>
+            <Button fx:id="LoginButton" layoutX="56.0" layoutY="220.0" mnemonicParsing="false" onMouseClicked="#LoginClicked" prefHeight="37.0" prefWidth="139.0" style="-fx-background-color: #3C3D37;" text="Login" textFill="WHITE">
+               <font>
+                  <Font name="Calibri Bold" size="15.0" />
+               </font>
+            </Button>
+            <PasswordField fx:id="PasswordTF" layoutX="21.0" layoutY="141.0" prefHeight="25.0" prefWidth="209.0" />
+            <CheckBox fx:id="showpass" layoutX="21.0" layoutY="175.0" mnemonicParsing="false" onAction="#ShowPassCheck" text="Show Password" textFill="WHITE" />
+         </children>
+      </Pane>
+      <Button fx:id="BackButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#BackClicked" style="-fx-background-color: black;" text="&lt; Back" textFill="WHITE">
+         <font>
+            <Font name="Calibri Bold" size="14.0" />
+         </font>
+      </Button>
+   </children>
+</Pane>
