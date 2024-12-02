@@ -16,7 +16,7 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
-public class AllCommissionsController {
+public class AllRequestController {
     @FXML
     private TreeView<String> CommissionTree;
     @FXML
@@ -192,7 +192,7 @@ public class AllCommissionsController {
 
     public void NewClicked(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewCommission.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewRequest.fxml"));
             Parent adminRoot = loader.load();
 
             Stage newStage = new Stage();

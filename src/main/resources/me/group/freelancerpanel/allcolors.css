@@ -1,3 +1,48 @@
 .backgroundColor {
     -fx-background-color: #000000;
 }
+/* DatePicker - set background color */
+.date-picker {
+    -fx-background-color: #282828;
+    -fx-control-inner-background: #282828;
+    -fx-text-fill: white; /* Optional: Set text color for contrast */
+}
+
+/* TextArea - set background color */
+.text-area {
+    -fx-background-color: #282828;
+    -fx-control-inner-background: #282828;
+    -fx-text-fill: white; /* Optional: Set text color for contrast */
+}
+
+.text-field {
+    -fx-background-color: #282828;
+    -fx-control-inner-background: #282828;
+    -fx-text-fill: white; /* Optional: Set text color for contrast */
+}
+
+/* Style the DatePicker arrow button */
+.date-picker .arrow-button {
+    -fx-background-color: #282828;
+    -fx-border-color: #282828; /* Optional: Match border color */
+}
+
+/* Style the DatePicker calendar popup */
+.date-picker-popup {
+    -fx-background-color: #282828;
+    -fx-control-inner-background: #282828; /* For inner content */
+    -fx-text-fill: white; /* Optional: Text color for better visibility */
+}
+
+/* Style the calendar days in the popup */
+.calendar-pane {
+    -fx-background-color: #282828;
+}
+
+.calendar-pane .day-cell {
+    -fx-text-fill: white; /* Set text color for day numbers */
+}
+
+.calendar-pane .day-cell:hover {
+    -fx-background-color: #3c3c3c; /* Optional: Hover effect */
+}

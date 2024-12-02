@@ -8,13 +8,6 @@ import java.sql.SQLException;
 
 public class DatabaseHandler {
 
-    @SuppressWarnings("unused")
-    private String loggedInUsername;
-
-    public void setLoggedInUsername(String username) {
-        this.loggedInUsername = username;
-    }
-
     private static final String DB_URL = "jdbc:mysql://79.127.235.186:3306/s127_CCEProject";
     private static final String USER = "u127_hd6DdSE6j4";
     private static final String PASSWORD = "S+pP^iqw^whxxjB1rBjC8.d@";
