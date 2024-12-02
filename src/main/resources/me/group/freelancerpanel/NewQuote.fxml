@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.NewRequestController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.NewQuoteController">
    <children>
       <AnchorPane prefHeight="63.0" prefWidth="650.0" style="-fx-background-color: #282828;">
          <children>
@@ -31,8 +31,7 @@
             <Font name="Calibri Bold" size="18.0" />
          </font>
       </Text>
-      <TextField fx:id="NameTF" layoutX="14.0" layoutY="121.0" prefHeight="25.0" prefWidth="607.0" stylesheets="@allcolors.css" />
-      <TextField fx:id="DiscordTF" layoutX="14.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
+      <TextField fx:id="TitleTF" layoutX="14.0" layoutY="121.0" prefHeight="25.0" prefWidth="607.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="14.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Client">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -66,7 +65,7 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <TextField fx:id="DiscordTF1" layoutX="224.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
+      <TextField fx:id="ProposedPriceTF" layoutX="224.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="224.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Proposed Price">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -92,14 +91,14 @@
             <Font name="Calibri Bold" size="18.0" />
          </font>
       </Text>
-      <DatePicker layoutX="14.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
+      <DatePicker fx:id="Deadline" layoutX="14.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
       <Text fill="#a9a9a9" layoutX="224.0" layoutY="266.0" strokeType="OUTSIDE" strokeWidth="0.0" text="The commission payment terms">
          <font>
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox layoutX="224.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
-      <DatePicker layoutX="433.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
+      <ComboBox fx:id="PaymentTermsComboBox" layoutX="224.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
+      <DatePicker fx:id="StartDate" layoutX="433.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="433.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Date">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -110,7 +109,7 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox layoutX="433.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="StatusComboBox" layoutX="433.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
       <Text fill="WHITE" layoutX="433.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Status">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -121,5 +120,6 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
+      <ComboBox fx:id="ClientComboBox" layoutX="14.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
    </children>
 </Pane>

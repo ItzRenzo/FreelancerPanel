@@ -74,6 +74,9 @@ public class LoginController {
                         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         Scene AdminScene = new Scene(AdminRoot);
                         stage.setScene(AdminScene);
+
+                        stage.centerOnScreen();
+
                         stage.show();
                     } else {
                         JOptionPane.showMessageDialog(null, "Login Failed. Please try again!");

@@ -40,6 +40,16 @@ public class DashboardController {
                 loadAllCommissionsView();
             }
         });
+        RequestTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("All requests")) {
+                loadAllRequestView();
+            }
+        });
+        QuotesTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("All quotes")) {
+                loadAllQuotesView();
+            }
+        });
     }
 
     @FXML
@@ -177,6 +187,38 @@ public class DashboardController {
         }
     }
 
+    private void loadAllRequestView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllRequest.fxml"));
+            Parent adminRoot = loader.load();
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadAllQuotesView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllQuotes.fxml"));
+            Parent adminRoot = loader.load();
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void OverviewClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
@@ -204,6 +246,21 @@ public class DashboardController {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error loading Clients.fxml: " + e.getMessage());
+        }
+    }
+
+    public void InvoiceClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Invoice.fxml"));
+            Parent AdminRoot = loader.load();
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Invoice.fxml: " + e.getMessage());
         }
     }
 }

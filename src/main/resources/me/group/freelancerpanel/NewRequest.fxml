@@ -31,8 +31,8 @@
             <Font name="Calibri Bold" size="18.0" />
          </font>
       </Text>
-      <TextField fx:id="NameTF" layoutX="14.0" layoutY="121.0" prefHeight="25.0" prefWidth="567.0" stylesheets="@allcolors.css" />
-      <TextField fx:id="DiscordTF" layoutX="14.0" layoutY="200.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@allcolors.css" />
+      <TextField fx:id="DescTF" layoutX="14.0" layoutY="121.0" prefHeight="25.0" prefWidth="567.0" stylesheets="@allcolors.css" />
+      <TextField fx:id="OfferedAmountTF" layoutX="14.0" layoutY="200.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="14.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Offered amount">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -66,7 +66,6 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <TextField fx:id="DiscordTF1" layoutX="314.0" layoutY="200.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="314.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Commission">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -92,12 +91,13 @@
             <Font name="Calibri Bold" size="18.0" />
          </font>
       </Text>
-      <DatePicker layoutX="14.0" layoutY="273.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@allcolors.css" />
+      <DatePicker fx:id="Deadline" layoutX="14.0" layoutY="273.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@allcolors.css" />
       <Text fill="#a9a9a9" layoutX="314.0" layoutY="266.0" strokeType="OUTSIDE" strokeWidth="0.0" text="The current status for the change">
          <font>
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox layoutX="314.0" layoutY="273.0" prefHeight="25.0" prefWidth="270.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="StatusComboBox" layoutX="314.0" layoutY="273.0" prefHeight="25.0" prefWidth="270.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="CommissionComboBox" layoutX="314.0" layoutY="200.0" prefHeight="25.0" prefWidth="270.0" style="-fx-background-color: #282828;" />
    </children>
 </Pane>

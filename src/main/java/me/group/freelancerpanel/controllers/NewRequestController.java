@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -19,24 +22,42 @@ import java.sql.SQLException;
 public class NewRequestController {
 
     @FXML
-    private TextField NameTF;
+    private TextField DescTF;
 
     @FXML
-    private TextField DiscordTF;
+    private TextField OfferedAmountTF;
 
     @FXML
-    private TextField EmailTF;
+    private ComboBox CommissionComboBox;
 
+    @FXML
+    private DatePicker Deadline;
+
+    @FXML
+    private ComboBox StatusComboBox;
 
     public void CreateClicked(MouseEvent event) {
-        String nameText = NameTF.getText();
-        String discordText = DiscordTF.getText();
-        String emailText = EmailTF.getText();
+        String descText = DescTF.getText();
+        String offeredamountText = OfferedAmountTF.getText();
+        Object commissionSelection = CommissionComboBox.getValue();
+        Object deadlineDate = Deadline.getValue();
+        Object statusSelection = StatusComboBox.getValue();
 
-        if (nameText.isEmpty() || (discordText.isEmpty() && !emailText.isEmpty())) {
-            JOptionPane.showMessageDialog(null, "Name, Discord Name, and Email is empty");
-        } else {
+        if (descText == null || descText.isEmpty() ||
+                commissionSelection == null ||
+                offeredamountText == null || offeredamountText.isEmpty() ||
+                deadlineDate == null ||
+                statusSelection == null) {
+
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Missing Information");
+            alert.setHeaderText("All fields are required");
+            alert.setContentText("Please fill in all fields before proceeding.");
+            alert.showAndWait();
+            return;
         }
+
+        System.out.println("All fields are filled. Proceeding with creating the request...");
     }
 
     public void CancelClicked(MouseEvent event) {

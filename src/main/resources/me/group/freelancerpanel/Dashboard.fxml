@@ -40,7 +40,7 @@
                         <TreeView fx:id="CommissionTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane prefHeight="60.0" prefWidth="218.0">
+                  <AnchorPane onMouseClicked="#InvoiceClicked" prefHeight="60.0" prefWidth="218.0">
                      <children>
                         <Text fill="WHITE" layoutX="74.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Invoices">
                            <font>
