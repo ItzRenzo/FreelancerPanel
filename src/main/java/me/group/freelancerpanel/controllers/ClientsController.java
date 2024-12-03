@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -23,10 +24,52 @@ public class ClientsController {
     private TreeView<String> RequestTree;
     @FXML
     private TreeView<String> QuotesTree;
+
     @FXML
     private Text User_name;
+
+    @FXML
+    private TextFlow User_name2;
+
     @FXML
     private Text User_email;
+
+    private int userId;
+    private String username;
+    private String email;
+
+    // Setter for userId
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    // Setter for username
+    public void setUsername(String username) {
+        this.username = username;
+        if (User_name != null && User_name2 != null) { // Ensure UI components are initialized
+            User_name.setText(username);
+            // Create the username text
+            Text usernameText = new Text(username);
+            usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Create the " / Overview" text
+            Text overviewText = new Text(" / Overview");
+            overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Add both Text nodes to the TextFlow
+            User_name2.getChildren().clear(); // Clear any existing content
+            User_name2.getChildren().addAll(usernameText, overviewText);
+        }
+    }
+
+    // Setter for user email
+    public void setUserEmail(String email) {
+        this.email = email;
+        if (User_email != null) { // Ensure UI components are initialized
+            User_email.setText(email);
+        }
+    }
+
 
     @FXML
     public void initialize() {
@@ -49,6 +92,25 @@ public class ClientsController {
                 loadAllQuotesView();
             }
         });
+
+        // Update the UI fields with initial values (if they are already set)
+        if (username != null) {
+            User_name.setText(username);
+            // Create the username text
+            Text usernameText = new Text(username);
+            usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Create the " / Overview" text
+            Text overviewText = new Text(" / Overview");
+            overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Add both Text nodes to the TextFlow
+            User_name2.getChildren().clear(); // Clear any existing content
+            User_name2.getChildren().addAll(usernameText, overviewText);
+        }
+        if (email != null) {
+            User_email.setText(email);
+        }
     }
 
     @FXML
@@ -170,41 +232,18 @@ public class ClientsController {
         });
     }
 
-    public void OverviewClicked(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
-            Parent AdminRoot = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            Scene AdminScene = new Scene(AdminRoot);
-            stage.setScene(AdminScene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error loading Dashboard.fxml: " + e.getMessage());
-        }
-    }
-
-    public void InvoiceClicked(MouseEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Invoice.fxml"));
-            Parent AdminRoot = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            Scene AdminScene = new Scene(AdminRoot);
-            stage.setScene(AdminScene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error loading Invoice.fxml: " + e.getMessage());
-        }
-    }
-
     private void loadAllCommissionsView() {
         try {
+            // Load the new FXML file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllCommissions.fxml"));
             Parent adminRoot = loader.load();
 
+            AllCommissionsController allcommissionController = loader.getController();
+            allcommissionController.setUserId(userId);
+            allcommissionController.setUsername(username);
+            allcommissionController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();
             Scene adminScene = new Scene(adminRoot);
             stage.setScene(adminScene);
@@ -219,6 +258,11 @@ public class ClientsController {
             // Load the new FXML file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllRequest.fxml"));
             Parent adminRoot = loader.load();
+
+            AllRequestController allrequestController = loader.getController();
+            allrequestController.setUserId(userId);
+            allrequestController.setUsername(username);
+            allrequestController.setUserEmail(email);
 
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();
@@ -236,6 +280,11 @@ public class ClientsController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllQuotes.fxml"));
             Parent adminRoot = loader.load();
 
+            AllQuotesController allquotesController = loader.getController();
+            allquotesController.setUserId(userId);
+            allquotesController.setUsername(username);
+            allquotesController.setUserEmail(email);
+
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();
             Scene adminScene = new Scene(adminRoot);
@@ -243,6 +292,66 @@ public class ClientsController {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void OverviewClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
+            Parent AdminRoot = loader.load();
+
+            DashboardController dashboardController = loader.getController();
+            dashboardController.setUserId(userId);
+            dashboardController.setUsername(username);
+            dashboardController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Dashboard.fxml: " + e.getMessage());
+        }
+    }
+
+    public void ClientsClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Clients.fxml"));
+            Parent AdminRoot = loader.load();
+
+            ClientsController clientsController = loader.getController();
+            clientsController.setUserId(userId);
+            clientsController.setUsername(username);
+            clientsController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Clients.fxml: " + e.getMessage());
+        }
+    }
+
+    public void InvoiceClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Invoice.fxml"));
+            Parent AdminRoot = loader.load();
+
+            InvoiceController invoiceController = loader.getController();
+            invoiceController.setUserId(userId);
+            invoiceController.setUsername(username);
+            invoiceController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Invoice.fxml: " + e.getMessage());
         }
     }
 

@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="1200.0" styleClass="backgroundColor" stylesheets="@allcolors.css" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.InvoiceController">
    <children>
@@ -145,16 +146,6 @@
                         </AnchorPane>
                      </children>
                   </AnchorPane>
-                  <Text fill="#aeaeae" layoutX="104.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Invoices">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Text>
-                  <Text fill="WHITE" layoutX="14.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User_name /">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Text>
                   <ScrollPane layoutX="33.0" layoutY="156.0" prefHeight="539.0" prefWidth="548.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1280.0">
@@ -178,6 +169,7 @@
                         </AnchorPane>
                     </content>
                   </ScrollPane>
+                  <TextFlow fx:id="User_name2" layoutX="14.0" layoutY="14.0" prefHeight="32.0" prefWidth="200.0" />
                </children>
             </Pane>
          </content>

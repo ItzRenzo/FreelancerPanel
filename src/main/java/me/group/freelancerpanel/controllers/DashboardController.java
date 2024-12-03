@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class DashboardController {
     private Text User_name;
 
     @FXML
-    private Text User_name2;
+    private TextFlow User_name2;
 
     @FXML
     private Text User_email;
@@ -48,7 +49,17 @@ public class DashboardController {
         this.username = username;
         if (User_name != null && User_name2 != null) { // Ensure UI components are initialized
             User_name.setText(username);
-            User_name2.setText(username + " /" + "Overview");
+            // Create the username text
+            Text usernameText = new Text(username);
+            usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Create the " / Overview" text
+            Text overviewText = new Text(" / Overview");
+            overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Add both Text nodes to the TextFlow
+            User_name2.getChildren().clear(); // Clear any existing content
+            User_name2.getChildren().addAll(usernameText, overviewText);
         }
     }
 
@@ -86,7 +97,17 @@ public class DashboardController {
         // Update the UI fields with initial values (if they are already set)
         if (username != null) {
             User_name.setText(username);
-            User_name2.setText(username);
+            // Create the username text
+            Text usernameText = new Text(username);
+            usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Create the " / Overview" text
+            Text overviewText = new Text(" / Overview");
+            overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+            // Add both Text nodes to the TextFlow
+            User_name2.getChildren().clear(); // Clear any existing content
+            User_name2.getChildren().addAll(usernameText, overviewText);
         }
         if (email != null) {
             User_email.setText(email);
@@ -218,6 +239,11 @@ public class DashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllCommissions.fxml"));
             Parent adminRoot = loader.load();
 
+            AllCommissionsController allcommissionController = loader.getController();
+            allcommissionController.setUserId(userId);
+            allcommissionController.setUsername(username);
+            allcommissionController.setUserEmail(email);
+
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();
             Scene adminScene = new Scene(adminRoot);
@@ -233,6 +259,11 @@ public class DashboardController {
             // Load the new FXML file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllRequest.fxml"));
             Parent adminRoot = loader.load();
+
+            AllRequestController allrequestController = loader.getController();
+            allrequestController.setUserId(userId);
+            allrequestController.setUsername(username);
+            allrequestController.setUserEmail(email);
 
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();
@@ -250,6 +281,11 @@ public class DashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AllQuotes.fxml"));
             Parent adminRoot = loader.load();
 
+            AllQuotesController allquotesController = loader.getController();
+            allquotesController.setUserId(userId);
+            allquotesController.setUsername(username);
+            allquotesController.setUserEmail(email);
+
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();
             Scene adminScene = new Scene(adminRoot);
@@ -264,6 +300,11 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
             Parent AdminRoot = loader.load();
+
+            DashboardController dashboardController = loader.getController();
+            dashboardController.setUserId(userId);
+            dashboardController.setUsername(username);
+            dashboardController.setUserEmail(email);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene AdminScene = new Scene(AdminRoot);
@@ -280,6 +321,11 @@ public class DashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Clients.fxml"));
             Parent AdminRoot = loader.load();
 
+            ClientsController clientsController = loader.getController();
+            clientsController.setUserId(userId);
+            clientsController.setUsername(username);
+            clientsController.setUserEmail(email);
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene AdminScene = new Scene(AdminRoot);
             stage.setScene(AdminScene);
@@ -294,6 +340,11 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Invoice.fxml"));
             Parent AdminRoot = loader.load();
+
+            InvoiceController invoiceController = loader.getController();
+            invoiceController.setUserId(userId);
+            invoiceController.setUsername(username);
+            invoiceController.setUserEmail(email);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene AdminScene = new Scene(AdminRoot);
