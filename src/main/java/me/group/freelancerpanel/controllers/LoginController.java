@@ -56,7 +56,9 @@ public class LoginController {
             JOptionPane.showMessageDialog(null, "Username or Password is empty");
         } else {
             try (Connection connection = me.group.freelancerpanel.controllers.DatabaseHandler.getConnection();
-                 PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?")) {
+                 PreparedStatement statement = connection.prepareStatement(
+                         "SELECT user_id, username, email FROM Freelancer WHERE username = ? AND password = ?")) {
+
                 statement.setString(1, userText);
 
                 if (showpass.isSelected()) {
@@ -67,16 +69,29 @@ public class LoginController {
 
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
+                        int userId = resultSet.getInt("user_id");
+                        String username = resultSet.getString("username");
+                        String email = resultSet.getString("email");
+
                         JOptionPane.showMessageDialog(null, "Login Successful");
 
+                        // Load the Dashboard
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
-                        Parent AdminRoot = loader.load();
+                        Parent adminRoot = loader.load();
+
+                        // Pass the user_id, username, and email to the next controller
+                        DashboardController dashboardController = loader.getController();
+                        dashboardController.setUserId(userId);
+                        dashboardController.setUsername(username);
+                        dashboardController.setUserEmail(email);
+
+                        // Set the scene
                         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                        Scene AdminScene = new Scene(AdminRoot);
-                        stage.setScene(AdminScene);
+                        Scene adminScene = new Scene(adminRoot);
+                        stage.setScene(adminScene);
 
+                        // Center the stage
                         stage.centerOnScreen();
-
                         stage.show();
                     } else {
                         JOptionPane.showMessageDialog(null, "Login Failed. Please try again!");
@@ -92,6 +107,8 @@ public class LoginController {
             }
         }
     }
+
+
 
     public void BackClicked(MouseEvent event) {
         try {

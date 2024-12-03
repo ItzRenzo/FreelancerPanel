@@ -24,10 +24,42 @@ public class DashboardController {
     private TreeView<String> RequestTree;
     @FXML
     private TreeView<String> QuotesTree;
+
     @FXML
     private Text User_name;
+
+    @FXML
+    private Text User_name2;
+
     @FXML
     private Text User_email;
+
+    private int userId;
+    private String username;
+    private String email;
+
+    // Setter for userId
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    // Setter for username
+    public void setUsername(String username) {
+        this.username = username;
+        if (User_name != null && User_name2 != null) { // Ensure UI components are initialized
+            User_name.setText(username);
+            User_name2.setText(username + " /" + "Overview");
+        }
+    }
+
+    // Setter for user email
+    public void setUserEmail(String email) {
+        this.email = email;
+        if (User_email != null) { // Ensure UI components are initialized
+            User_email.setText(email);
+        }
+    }
+
 
     @FXML
     public void initialize() {
@@ -50,6 +82,15 @@ public class DashboardController {
                 loadAllQuotesView();
             }
         });
+
+        // Update the UI fields with initial values (if they are already set)
+        if (username != null) {
+            User_name.setText(username);
+            User_name2.setText(username);
+        }
+        if (email != null) {
+            User_email.setText(email);
+        }
     }
 
     @FXML

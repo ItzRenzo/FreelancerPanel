@@ -73,49 +73,56 @@ public class CreateAccountPageController {
     public void CreateButtonClicked(MouseEvent event) {
         String name = UserTF.getText();
         String email = EmailTF.getText();
-        String password = new String(PasswordTF.getText());
+        String password = PasswordTF.getText(); // No need to wrap in new String
+
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "All fields are required.");
+            return;
+        }
 
         // Establish database connection
         try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username = ?")) {
-            statement.setString(1, name);
+             PreparedStatement checkStatement = connection.prepareStatement("SELECT * FROM Freelancer WHERE username = ?")) {
 
-            try (ResultSet resultSet = statement.executeQuery()) {
+            // Check if the username already exists
+            checkStatement.setString(1, name);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    JOptionPane.showMessageDialog(null, "Username already exists");
-                } else {
-                    // Insert the registration information into the database
-                    String insertQuery = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-                    PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
-                    insertStatement.setString(1, name);
-                    insertStatement.setString(2, email);
-                    insertStatement.setString(3, password);
-
-                    int rowsAffected = insertStatement.executeUpdate();
-
-                    if (rowsAffected == 1) {
-                        JOptionPane.showMessageDialog(null, "Registration Successful");
-
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Login.fxml"));
-                        Parent mainRoot = loader.load();
-
-                        Scene mainScene = new Scene(mainRoot);
-                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                        stage.setScene(mainScene);
-                        stage.show();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Registration Failed");
-                    }
-
-                    insertStatement.close();
+                    JOptionPane.showMessageDialog(null, "Username already exists.");
+                    return;
                 }
+            }
 
-                resultSet.close();
+            // Insert the registration information into the Freelancer table
+            String insertQuery = "INSERT INTO Freelancer (username, email, password) VALUES (?, ?, ?)";
+            try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                insertStatement.setString(1, name);
+                insertStatement.setString(2, email);
+                insertStatement.setString(3, password);
+
+                int rowsAffected = insertStatement.executeUpdate();
+
+                if (rowsAffected == 1) {
+                    JOptionPane.showMessageDialog(null, "Registration Successful");
+
+                    // Redirect to Login.fxml
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Login.fxml"));
+                    Parent mainRoot = loader.load();
+                    Scene mainScene = new Scene(mainRoot);
+                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    stage.setScene(mainScene);
+                    stage.centerOnScreen();
+                    stage.show();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Registration Failed. Please try again.");
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "An error occurred while connecting to the database.");
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "An error occurred while loading the login screen.");
         }
     }
 }

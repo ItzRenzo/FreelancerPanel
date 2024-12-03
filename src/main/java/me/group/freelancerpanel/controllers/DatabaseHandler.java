@@ -8,9 +8,9 @@ import java.sql.SQLException;
 
 public class DatabaseHandler {
 
-    private static final String DB_URL = "jdbc:mysql://79.127.235.186:3306/s127_CCEProject";
-    private static final String USER = "u127_hd6DdSE6j4";
-    private static final String PASSWORD = "S+pP^iqw^whxxjB1rBjC8.d@";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/FreelancerProject";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, USER, PASSWORD);
