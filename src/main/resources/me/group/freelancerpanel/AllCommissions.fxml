@@ -82,6 +82,20 @@
                         <TreeView fx:id="QuotesTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
                      </children>
                   </AnchorPane>
+                  <AnchorPane onMouseClicked="#ProductClicked" prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <Text fill="WHITE" layoutX="72.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Products">
+                           <font>
+                              <Font name="Century Gothic Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="33.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/product.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
                </children>
             </VBox>
          </content>
@@ -150,17 +164,17 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1120.0">
                            <children>
-                              <TableView layoutY="-1.0" prefHeight="520.0" prefWidth="1120.0" stylesheets="@tableview.css">
+                              <TableView fx:id="commissionTable" layoutY="-1.0" prefHeight="520.0" prefWidth="1120.0" stylesheets="@tableview.css">
                                 <columns>
-                                  <TableColumn text="# ID" />
-                                  <TableColumn prefWidth="190.0" text="Title" />
-                                    <TableColumn prefWidth="120.0" text="Client" />
-                                    <TableColumn prefWidth="120.0" text="Total Value" />
-                                    <TableColumn prefWidth="120.0" text="Total Paid" />
-                                    <TableColumn prefWidth="120.0" text="Start Date" />
-                                    <TableColumn prefWidth="120.0" text="Deadline" />
-                                    <TableColumn prefWidth="120.0" text="Product" />
-                                    <TableColumn prefWidth="120.0" text="Status" />
+                                  <TableColumn fx:id="CommissionID" text="# ID" />
+                                  <TableColumn fx:id="CommissionTitle" prefWidth="190.0" text="Title" />
+                                    <TableColumn fx:id="CommissionClient" prefWidth="120.0" text="Client" />
+                                    <TableColumn fx:id="CommissionTotalValue" prefWidth="120.0" text="Total Value" />
+                                    <TableColumn fx:id="CommissionTotalPaid" prefWidth="120.0" text="Total Paid" />
+                                    <TableColumn fx:id="CommissionStartDate" prefWidth="120.0" text="Start Date" />
+                                    <TableColumn fx:id="CommissionDeadline" prefWidth="120.0" text="Deadline" />
+                                    <TableColumn fx:id="CommissionProduct" prefWidth="120.0" text="Product" />
+                                    <TableColumn fx:id="CommissionStatus" prefWidth="120.0" text="Status" />
                                 </columns>
                               </TableView>
                            </children>

@@ -82,6 +82,20 @@
                         <TreeView fx:id="QuotesTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
                      </children>
                   </AnchorPane>
+                  <AnchorPane onMouseClicked="#ProductClicked" prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <Text fill="WHITE" layoutX="72.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Products">
+                           <font>
+                              <Font name="Century Gothic Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="33.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/product.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
                </children>
             </VBox>
          </content>
@@ -150,7 +164,7 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="848.0">
                            <children>
-                              <TableView layoutY="-1.0" prefHeight="520.0" prefWidth="849.0" stylesheets="@tableview.css">
+                              <TableView fx:id="clientTable" layoutY="-1.0" prefHeight="520.0" prefWidth="849.0" stylesheets="@tableview.css">
                                 <columns>
                                   <TableColumn fx:id="ClientID" prefWidth="120.0" text="# ID" />
                                   <TableColumn fx:id="ClientName" prefWidth="120.0" text="Name" />

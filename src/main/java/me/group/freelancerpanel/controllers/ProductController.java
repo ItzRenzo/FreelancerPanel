@@ -1,12 +1,14 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -16,8 +18,23 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class AllRequestController {
+public class ProductController {
+
+    @FXML
+    private TableView<Product> productTable;
+
+    @FXML
+    private TableColumn<Product, String> productName;
+
+    @FXML
+    private TableColumn<Product, String> productDescription;
+
+
     @FXML
     private TreeView<String> CommissionTree;
     @FXML
@@ -41,6 +58,8 @@ public class AllRequestController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        System.out.println("ProductController: User ID set to " + userId);
+        loadProductData(); // Ensure data is loaded after userId is set
     }
 
     // Setter for username
@@ -52,8 +71,7 @@ public class AllRequestController {
             Text usernameText = new Text(username);
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
-            // Create the " / Overview" text
-            Text overviewText = new Text(" / Requests");
+            Text overviewText = new Text(" / Products");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -76,6 +94,17 @@ public class AllRequestController {
         initializeCommissionTree();
         initializeRequestTree();
         initializeQuotesTree();
+
+        // Set up the TableView columns
+        productName.setStyle("-fx-text-fill: white;");
+        productDescription.setStyle("-fx-text-fill: white;");
+
+        // Configure the product table columns
+        productName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        productDescription.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
+
+        // Load product data into the table
+        loadProductData();
 
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
@@ -101,7 +130,7 @@ public class AllRequestController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Requests");
+            Text overviewText = new Text(" / Products");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -112,6 +141,38 @@ public class AllRequestController {
             User_email.setText(email);
         }
     }
+
+    public void loadProductData() {
+        ObservableList<Product> productList = FXCollections.observableArrayList();
+
+        String query = "SELECT product_id, product_name, product_description FROM product WHERE user_id = ?";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, userId); // Use the logged-in user's ID
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("product_id");
+                String name = resultSet.getString("product_name");
+                String description = resultSet.getString("product_description");
+
+                productList.add(new Product(id, name, description));
+            }
+
+            productTable.setItems(productList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database Error");
+            alert.setHeaderText("Failed to Load Products");
+            alert.setContentText("An error occurred while loading product data.");
+            alert.showAndWait();
+        }
+    }
+
 
     @FXML
     private void initializeCommissionTree() {
@@ -377,8 +438,12 @@ public class AllRequestController {
 
     public void NewClicked(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewRequest.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewProduct.fxml"));
             Parent adminRoot = loader.load();
+
+            NewProductController controller = loader.getController();
+            controller.setUserId(userId);
+            controller.setProductsController(this); // Pass the reference
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);
@@ -386,12 +451,11 @@ public class AllRequestController {
             newStage.setResizable(false);
             newStage.initStyle(StageStyle.UNDECORATED);
             newStage.setScene(adminScene);
-            newStage.setTitle("New Request");
+            newStage.setTitle("New Product");
             newStage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error loading NewRequest.fxml: " + e.getMessage());
+            System.err.println("Error loading NewProduct.fxml: " + e.getMessage());
         }
     }
 }
-

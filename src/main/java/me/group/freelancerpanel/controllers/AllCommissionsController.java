@@ -1,10 +1,14 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -16,8 +20,43 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class AllCommissionsController {
+
+    @FXML
+    private TableView<Commission> commissionTable;
+
+    @FXML
+    private TableColumn<Commission, Integer> CommissionID;
+
+    @FXML
+    private TableColumn<Commission, String> CommissionTitle;
+
+    @FXML
+    private TableColumn<Commission, String> CommissionClient;
+
+    @FXML
+    private TableColumn<Commission, Double> CommissionTotalValue;
+
+    @FXML
+    private TableColumn<Commission, Double> CommissionTotalPaid;
+
+    @FXML
+    private TableColumn<Commission, String> CommissionStartDate;
+
+    @FXML
+    private TableColumn<Commission, String> CommissionDeadline;
+
+    @FXML
+    private TableColumn<Commission, String> CommissionProduct;
+
+    @FXML
+    private TableColumn<Commission, String> CommissionStatus;
+
     @FXML
     private TreeView<String> CommissionTree;
     @FXML
@@ -53,7 +92,7 @@ public class AllCommissionsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Commissions");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -76,6 +115,30 @@ public class AllCommissionsController {
         initializeCommissionTree();
         initializeRequestTree();
         initializeQuotesTree();
+
+        CommissionID.setStyle("-fx-text-fill: white;");
+        CommissionTitle.setStyle("-fx-text-fill: white;");
+        CommissionClient.setStyle("-fx-text-fill: white;");
+        CommissionTotalValue.setStyle("-fx-text-fill: white;");
+        CommissionTotalPaid.setStyle("-fx-text-fill: white;");
+        CommissionStartDate.setStyle("-fx-text-fill: white;");
+        CommissionDeadline.setStyle("-fx-text-fill: white;");
+        CommissionProduct.setStyle("-fx-text-fill: white;");
+        CommissionStatus.setStyle("-fx-text-fill: white;");
+
+        // Bind columns to model properties
+        CommissionID.setCellValueFactory(cellData -> cellData.getValue().commissionIDProperty().asObject());
+        CommissionTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        CommissionClient.setCellValueFactory(cellData -> cellData.getValue().clientProperty());
+        CommissionTotalValue.setCellValueFactory(cellData -> cellData.getValue().totalValueProperty().asObject());
+        CommissionTotalPaid.setCellValueFactory(cellData -> cellData.getValue().totalPaidProperty().asObject());
+        CommissionStartDate.setCellValueFactory(cellData -> cellData.getValue().startDateProperty());
+        CommissionDeadline.setCellValueFactory(cellData -> cellData.getValue().deadlineProperty());
+        CommissionProduct.setCellValueFactory(cellData -> cellData.getValue().productProperty());
+        CommissionStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+
+        // Load data into the table
+        loadCommissionData();
 
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
@@ -101,7 +164,7 @@ public class AllCommissionsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Commissions");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -111,6 +174,48 @@ public class AllCommissionsController {
         if (email != null) {
             User_email.setText(email);
         }
+    }
+
+    private void loadCommissionData() {
+        // ObservableList to hold commission data
+        ObservableList<Commission> commissions = FXCollections.observableArrayList();
+
+        try {
+            // Assuming a database connection is established
+            Connection connection = DatabaseHandler.getConnection();
+            // SQL query to join the commission, client, and product tables
+            String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
+                    "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
+                    "p.product_name, c.commission_status " +
+                    "FROM commission c " +
+                    "LEFT JOIN client cl ON c.client_id = cl.client_id " +
+                    "LEFT JOIN product p ON c.product_id = p.product_id";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                // Populate the Commission object with the data
+                commissions.add(new Commission(
+                        resultSet.getInt("commission_id"),
+                        resultSet.getString("commission_title"),
+                        resultSet.getString("client_name"), // Fetch client_name instead of client_id
+                        resultSet.getDouble("commission_total_value"),
+                        resultSet.getDouble("commission_total_paid"),
+                        resultSet.getString("commission_start_date"),
+                        resultSet.getString("commission_deadline"),
+                        resultSet.getString("product_name"), // Fetch product_name instead of product_id
+                        resultSet.getString("commission_status")
+                ));
+            }
+
+            // Close the connection
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Set the data to the TableView
+        commissionTable.setItems(commissions);
     }
 
     @FXML
@@ -355,10 +460,33 @@ public class AllCommissionsController {
         }
     }
 
+    public void ProductClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Product.fxml"));
+            Parent AdminRoot = loader.load();
+
+            ProductController productController = loader.getController();
+            productController.setUserId(userId);
+            productController.setUsername(username);
+            productController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Product.fxml: " + e.getMessage());
+        }
+    }
+
     public void NewClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewCommission.fxml"));
             Parent adminRoot = loader.load();
+
+            NewCommissionController newCommissionController = loader.getController();
+            newCommissionController.setUserId(userId);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);

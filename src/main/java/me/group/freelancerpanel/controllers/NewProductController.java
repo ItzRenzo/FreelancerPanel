@@ -3,6 +3,7 @@ package me.group.freelancerpanel.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -13,35 +14,31 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class NewClientController {
+public class NewProductController {
 
     @FXML
-    private TextField NameTF;
+    private TextField ProductNameTF;
 
     @FXML
-    private TextField DiscordTF;
-
-    @FXML
-    private TextField EmailTF;
+    private TextArea ProductDescriptionTF;
 
     private int userId; // Store the current logged-in user's ID
 
-    private ClientsController clientsController;
+    private ProductController productController;
 
     public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public void setClientsController(ClientsController clientsController) {
-        this.clientsController = clientsController;
+    public void setProductsController(ProductController productController) {
+        this.productController = productController;
     }
 
     public void CreateClicked(MouseEvent event) {
-        String nameText = NameTF.getText();
-        String discordText = DiscordTF.getText();
-        String emailText = EmailTF.getText();
+        String productnameText = ProductNameTF.getText();
+        String productdescText = ProductDescriptionTF.getText();
 
-        if (nameText.isEmpty() || discordText.isEmpty() || emailText.isEmpty()) {
+        if (productnameText.isEmpty() || productdescText.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Missing Information");
             alert.setHeaderText("All fields are required");
@@ -50,30 +47,25 @@ public class NewClientController {
             return;
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        String clientSince = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        String insertQuery = "INSERT INTO client (user_id, client_name, client_discord, client_email, client_since) VALUES (?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO product (user_id, product_name, product_description) VALUES (?, ?, ?)";
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
 
             preparedStatement.setInt(1, userId);
-            preparedStatement.setString(2, nameText);
-            preparedStatement.setString(3, discordText);
-            preparedStatement.setString(4, emailText);
-            preparedStatement.setString(5, clientSince);
+            preparedStatement.setString(2, productnameText);
+            preparedStatement.setString(3, productdescText);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 1) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
-                alert.setHeaderText("Client Created");
-                alert.setContentText("The new client has been successfully added.");
+                alert.setHeaderText("Product Created");
+                alert.setContentText("The new product has been successfully added.");
                 alert.showAndWait();
 
-                if (clientsController != null) {
-                    clientsController.loadClientData();
+                if (productController != null) {
+                    productController.loadProductData();
                 }
 
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -81,8 +73,8 @@ public class NewClientController {
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
-                alert.setHeaderText("Failed to Create Client");
-                alert.setContentText("An error occurred while adding the client. Please try again.");
+                alert.setHeaderText("Failed to Create Product");
+                alert.setContentText("An error occurred while adding the product. Please try again.");
                 alert.showAndWait();
             }
 
@@ -90,7 +82,7 @@ public class NewClientController {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Database Error");
-            alert.setHeaderText("Failed to Create Client");
+            alert.setHeaderText("Failed to Create Product");
             alert.setContentText("An error occurred while connecting to the database: " + e.getMessage());
             alert.showAndWait();
         }

@@ -54,7 +54,7 @@ public class AllQuotesController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Quotes");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -102,7 +102,7 @@ public class AllQuotesController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Quotes");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -353,6 +353,26 @@ public class AllQuotesController {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error loading Invoice.fxml: " + e.getMessage());
+        }
+    }
+
+    public void ProductClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Product.fxml"));
+            Parent AdminRoot = loader.load();
+
+            ProductController productController = loader.getController();
+            productController.setUserId(userId);
+            productController.setUsername(username);
+            productController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Product.fxml: " + e.getMessage());
         }
     }
 

@@ -42,6 +42,7 @@ public class DashboardController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        System.out.println("DashboardController: User ID set to " + userId);
     }
 
     // Setter for username
@@ -353,6 +354,26 @@ public class DashboardController {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error loading Invoice.fxml: " + e.getMessage());
+        }
+    }
+
+    public void ProductClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Product.fxml"));
+            Parent AdminRoot = loader.load();
+
+            ProductController productController = loader.getController();
+            productController.setUserId(userId);
+            productController.setUsername(username);
+            productController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Product.fxml: " + e.getMessage());
         }
     }
 }

@@ -18,19 +18,20 @@ public class DatabaseHandler {
 
     public String[] getUserByUsername(String username) {
         try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT id, username, email, password FROM users WHERE username = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT user_id, username, email, password FROM freelancer WHERE username = ?")) {
             statement.setString(1, username);
 
             System.out.println("Executing SQL query...");
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    String id = String.valueOf(resultSet.getInt("id"));
+                    int id = resultSet.getInt("user_id");
                     String retrievedUsername = resultSet.getString("username");
                     String email = resultSet.getString("email");
                     String password = resultSet.getString("password");
 
-                    return new String[]{id, retrievedUsername, email, password};
+                    System.out.println("User retrieved: ID=" + id + ", Username=" + retrievedUsername);
+                    return new String[]{String.valueOf(id), retrievedUsername, email, password};
                 }
             }
         } catch (SQLException e) {

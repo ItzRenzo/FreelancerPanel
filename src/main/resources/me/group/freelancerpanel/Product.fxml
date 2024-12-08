@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="1200.0" styleClass="backgroundColor" stylesheets="@allcolors.css" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.AllRequestController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="1200.0" styleClass="backgroundColor" stylesheets="@allcolors.css" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.ProductController">
    <children>
       <ScrollPane layoutX="5.0" layoutY="163.0" prefHeight="520.0" prefWidth="299.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
          <content>
@@ -82,14 +82,14 @@
                         <TreeView fx:id="QuotesTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane onMouseClicked="#ProductClicked" prefHeight="60.0" prefWidth="218.0">
+                  <AnchorPane prefHeight="60.0" prefWidth="218.0">
                      <children>
                         <Text fill="WHITE" layoutX="72.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Products">
                            <font>
                               <Font name="Century Gothic Bold" size="15.0" />
                            </font>
                         </Text>
-                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="33.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="33.0" layoutY="16.0" onMouseClicked="#ProductClicked" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@images/product.png" />
                            </image>
@@ -160,20 +160,14 @@
                         </AnchorPane>
                      </children>
                   </AnchorPane>
-                  <ScrollPane layoutX="33.0" layoutY="156.0" prefHeight="539.0" prefWidth="548.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+                  <ScrollPane layoutX="33.0" layoutY="156.0" prefHeight="539.0" prefWidth="538.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1000.0">
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="535.0">
                            <children>
-                              <TableView layoutY="-1.0" prefHeight="520.0" prefWidth="1000.0" stylesheets="@tableview.css">
+                              <TableView fx:id="productTable" layoutY="-1.0" prefHeight="520.0" prefWidth="535.0" stylesheets="@tableview.css">
                                 <columns>
-                                  <TableColumn text="# ID" />
-                                  <TableColumn prefWidth="190.0" text="Title" />
-                                    <TableColumn prefWidth="120.0" text="Commission" />
-                                    <TableColumn prefWidth="120.0" text="Offered Amount" />
-                                    <TableColumn prefWidth="120.0" text="Paid" />
-                                    <TableColumn prefWidth="120.0" text="Deadline" />
-                                    <TableColumn prefWidth="120.0" text="Submitted at" />
-                                    <TableColumn prefWidth="120.0" text="Status" />
+                                  <TableColumn fx:id="productName" prefWidth="267.0" text="Product Name" />
+                                    <TableColumn fx:id="productDescription" prefWidth="267.0" text="Product Description" />
                                 </columns>
                               </TableView>
                            </children>

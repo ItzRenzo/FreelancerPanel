@@ -2,6 +2,7 @@
 .table-view {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
+    -fx-text-fill: white; /* Default text color */
 }
 
 /* Set the entire header background color */
@@ -43,10 +44,12 @@
 /* Remove focus border when a row is selected */
 .table-row-cell:focused {
     -fx-background-color: transparent;
+    -fx-text-fill: white; /* Text color inside the cells */
 }
 
 /* Remove background color for selected rows */
 .table-row-cell:filled:selected, .table-cell:selected {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
+    -fx-text-fill: white; /* Text color inside the cells */
 }

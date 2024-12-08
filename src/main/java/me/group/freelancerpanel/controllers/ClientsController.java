@@ -1,12 +1,13 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -16,8 +17,37 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ClientsController {
+
+    @FXML
+    private TableView<Client> clientTable;
+
+    @FXML
+    private TableColumn<Client, Integer> ClientID;
+
+    @FXML
+    private TableColumn<Client, String> ClientName;
+
+    @FXML
+    private TableColumn<Client, String> ClientEmail;
+
+    @FXML
+    private TableColumn<Client, String> ClientDiscord;
+
+    @FXML
+    private TableColumn<Client, Integer> ClientTotalCommission;
+
+    @FXML
+    private TableColumn<Client, Double> ClientTotalRevenue;
+
+    @FXML
+    private TableColumn<Client, String> ClientSince;
+
     @FXML
     private TreeView<String> CommissionTree;
     @FXML
@@ -38,9 +68,10 @@ public class ClientsController {
     private String username;
     private String email;
 
-    // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        System.out.println("ClientsController: User ID set to " + userId);
+        loadClientData(); // Ensure data is loaded after userId is set
     }
 
     // Setter for username
@@ -53,7 +84,7 @@ public class ClientsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Clients");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -73,6 +104,23 @@ public class ClientsController {
 
     @FXML
     public void initialize() {
+        // Set up the TableView columns
+        ClientID.setStyle("-fx-text-fill: white;");
+        ClientName.setStyle("-fx-text-fill: white;");
+        ClientEmail.setStyle("-fx-text-fill: white;");
+        ClientDiscord.setStyle("-fx-text-fill: white;");
+        ClientTotalCommission.setStyle("-fx-text-fill: white;");
+        ClientTotalRevenue.setStyle("-fx-text-fill: white;");
+        ClientSince.setStyle("-fx-text-fill: white;");
+
+        ClientID.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+        ClientName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        ClientEmail.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
+        ClientDiscord.setCellValueFactory(cellData -> cellData.getValue().discordProperty());
+        ClientTotalCommission.setCellValueFactory(cellData -> cellData.getValue().totalCommissionProperty().asObject());
+        ClientTotalRevenue.setCellValueFactory(cellData -> cellData.getValue().totalRevenueProperty().asObject());
+        ClientSince.setCellValueFactory(cellData -> cellData.getValue().sinceProperty());
+
         initializeCommissionTree();
         initializeRequestTree();
         initializeQuotesTree();
@@ -101,7 +149,7 @@ public class ClientsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Clients");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -110,6 +158,42 @@ public class ClientsController {
         }
         if (email != null) {
             User_email.setText(email);
+        }
+    }
+
+    public void loadClientData() {
+        ObservableList<Client> clientList = FXCollections.observableArrayList();
+
+        String query = "SELECT client_id, client_name, client_email, client_discord, client_total_commission, client_total_revenue, client_since " +
+                "FROM client WHERE user_id = ?";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, userId); // Use the logged-in user's ID
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("client_id");
+                String name = resultSet.getString("client_name");
+                String email = resultSet.getString("client_email");
+                String discord = resultSet.getString("client_discord");
+                int totalCommission = resultSet.getInt("client_total_commission");
+                double totalRevenue = resultSet.getDouble("client_total_revenue");
+                String since = resultSet.getString("client_since");
+
+                clientList.add(new Client(id, name, email, discord, totalCommission, totalRevenue, since));
+            }
+
+            clientTable.setItems(clientList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database Error");
+            alert.setHeaderText("Failed to Load Clients");
+            alert.setContentText("An error occurred while loading client data.");
+            alert.showAndWait();
         }
     }
 
@@ -355,10 +439,34 @@ public class ClientsController {
         }
     }
 
+    public void ProductClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Product.fxml"));
+            Parent AdminRoot = loader.load();
+
+            ProductController productController = loader.getController();
+            productController.setUserId(userId);
+            productController.setUsername(username);
+            productController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Product.fxml: " + e.getMessage());
+        }
+    }
+
     public void NewClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewClient.fxml"));
             Parent adminRoot = loader.load();
+
+            NewClientController controller = loader.getController();
+            controller.setUserId(userId);
+            controller.setClientsController(this); // Pass the reference
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);
@@ -373,5 +481,6 @@ public class ClientsController {
             System.err.println("Error loading NewClient.fxml: " + e.getMessage());
         }
     }
+
 
 }
