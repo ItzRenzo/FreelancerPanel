@@ -36,6 +36,12 @@ public class Commission {
     public StringProperty deadlineProperty() { return deadline; }
     public StringProperty productProperty() { return product; }
     public StringProperty statusProperty() { return status; }
+
+    // Override toString to display only the commission title
+    @Override
+    public String toString() {
+        return title.get(); // This will be shown in the ComboBox
+    }
 }
 
 

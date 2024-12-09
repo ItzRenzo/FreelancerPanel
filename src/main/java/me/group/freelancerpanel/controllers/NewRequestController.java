@@ -36,6 +36,65 @@ public class NewRequestController {
     @FXML
     private ComboBox StatusComboBox;
 
+    private AllRequestController allrequestController;
+
+    public void setAllRequestController(AllRequestController allrequestController) {
+        this.allrequestController = allrequestController;
+    }
+
+    private int userId; // Store the current logged-in user's ID
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+        loadCommissionsIntoComboBox(); // Load clients after setting user ID
+    }
+
+    @FXML
+    private void initialize() {
+        initializeStatusComboBox(); // Load status options on controller load
+    }
+
+    // Populate status ComboBox with predefined values
+    private void initializeStatusComboBox() {
+        StatusComboBox.getItems().addAll("Rejected", "Pending", "Accepted", "Cancelled");
+    }
+
+    // Populate the CommissionComboBox
+    private void loadCommissionsIntoComboBox() {
+        String query = "SELECT commission_id, commission_title FROM commission WHERE user_id = ?";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                // Create a Commission object with the minimal constructor
+                Commission commission = new Commission(
+                        resultSet.getInt("commission_id"),
+                        resultSet.getString("commission_title"),
+                        null, // client_name (not retrieved in this query)
+                        0.0,  // total_value (default value)
+                        0.0,  // total_paid (default value)
+                        null, // start_date (not retrieved in this query)
+                        null, // deadline (not retrieved in this query)
+                        null, // product_name (not retrieved in this query)
+                        null  // status (not retrieved in this query)
+                );
+                CommissionComboBox.getItems().add(commission);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database Error");
+            alert.setHeaderText("Failed to Load Commissions");
+            alert.setContentText("An error occurred while loading commissions: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
     public void CreateClicked(MouseEvent event) {
         String descText = DescTF.getText();
         String offeredamountText = OfferedAmountTF.getText();

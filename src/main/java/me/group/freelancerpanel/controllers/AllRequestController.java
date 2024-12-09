@@ -380,6 +380,10 @@ public class AllRequestController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewRequest.fxml"));
             Parent adminRoot = loader.load();
 
+            NewRequestController newRequestController = loader.getController();
+            newRequestController.setUserId(userId); // Set User ID
+            newRequestController.setAllRequestController(this);
+
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);
 
