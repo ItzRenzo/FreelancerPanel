@@ -1,10 +1,14 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -16,8 +20,45 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class InvoiceController {
+
+    @FXML
+    private TableView<Invoice> invoiceTable;
+
+    @FXML
+    private TableColumn<Invoice, Integer> InvoiceID;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoiceCreatedat;
+
+    @FXML
+    private TableColumn<Invoice, Double> InvoiceAmount;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoiceStatus;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoicePaymentLink;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoicePaidat;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoiceDueat;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoiceClient;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoiceTitle;
+
+    @FXML
+    private TableColumn<Invoice, String> InvoiceMemo;
 
     @FXML
     private TreeView<String> CommissionTree;
@@ -42,6 +83,8 @@ public class InvoiceController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        System.out.println("InvoiceController: User ID set to " + userId);
+        loadInvoiceData(); // Ensure data is loaded after userId is set
     }
 
     // Setter for username
@@ -78,6 +121,31 @@ public class InvoiceController {
         initializeRequestTree();
         initializeQuotesTree();
 
+        // Set up the TableView columns
+        InvoiceID.setStyle("-fx-text-fill: white;");
+        InvoiceCreatedat.setStyle("-fx-text-fill: white;");
+        InvoiceAmount.setStyle("-fx-text-fill: white;");
+        InvoiceStatus.setStyle("-fx-text-fill: white;");
+        InvoicePaymentLink.setStyle("-fx-text-fill: white;");
+        InvoicePaidat.setStyle("-fx-text-fill: white;");
+        InvoiceDueat.setStyle("-fx-text-fill: white;");
+        InvoiceClient.setStyle("-fx-text-fill: white;");
+        InvoiceTitle.setStyle("-fx-text-fill: white;");
+        InvoiceMemo.setStyle("-fx-text-fill: white;");
+
+        InvoiceID.setCellValueFactory(cellData -> cellData.getValue().invoiceIDProperty().asObject());
+        InvoiceCreatedat.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty());
+        InvoiceAmount.setCellValueFactory(cellData -> cellData.getValue().amountProperty().asObject());
+        InvoiceStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        InvoicePaymentLink.setCellValueFactory(cellData -> cellData.getValue().paymentLinkProperty());
+        InvoicePaidat.setCellValueFactory(cellData -> cellData.getValue().paidAtProperty());
+        InvoiceDueat.setCellValueFactory(cellData -> cellData.getValue().dueAtProperty());
+        InvoiceClient.setCellValueFactory(cellData -> cellData.getValue().clientNameProperty());
+        InvoiceTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        InvoiceMemo.setCellValueFactory(cellData -> cellData.getValue().memoProperty());
+
+        loadInvoiceData();
+
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
                 loadAllCommissionsView();
@@ -113,6 +181,45 @@ public class InvoiceController {
             User_email.setText(email);
         }
     }
+
+    private void loadInvoiceData() {
+        ObservableList<Invoice> invoices = FXCollections.observableArrayList();
+
+        String query = "SELECT i.invoice_id, i.invoice_created_at, i.invoice_amount, i.invoice_status, " +
+                "i.invoice_payment_link, i.invoice_paid_at, i.invoice_due_at, cl.client_name, " +
+                "i.invoice_title, i.invoice_memo " +
+                "FROM invoice i " +
+                "LEFT JOIN client cl ON i.client_id = cl.client_id " +
+                "WHERE i.user_id = ?";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId); // Filter by the current user's ID
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                invoices.add(new Invoice(
+                        resultSet.getInt("invoice_id"),
+                        resultSet.getString("invoice_created_at"),
+                        resultSet.getDouble("invoice_amount"),
+                        resultSet.getString("invoice_status"),
+                        resultSet.getString("invoice_payment_link"),
+                        resultSet.getString("invoice_paid_at"),
+                        resultSet.getString("invoice_due_at"),
+                        resultSet.getString("client_name"),
+                        resultSet.getString("invoice_title"),
+                        resultSet.getString("invoice_memo")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        invoiceTable.setItems(invoices);
+    }
+
+
     @FXML
     private void initializeCommissionTree() {
         // Load the image
@@ -379,6 +486,9 @@ public class InvoiceController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewInvoice.fxml"));
             Parent adminRoot = loader.load();
+
+            NewInvoiceController controller = loader.getController();
+            controller.setUserId(userId);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);
