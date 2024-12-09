@@ -38,6 +38,12 @@ public class NewCommissionController {
     @FXML
     private TextArea NotesTA;
 
+    private AllCommissionsController allcommissionsController;
+
+    public void setAllCommissionsController(AllCommissionsController allcommissionsController) {
+        this.allcommissionsController = allcommissionsController;
+    }
+
     private int userId;
 
     public void setUserId(int userId) {
@@ -192,6 +198,11 @@ public class NewCommissionController {
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 1) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Commission Created", "The new commission has been successfully added.");
+
+                if (allcommissionsController != null) {
+                    allcommissionsController.loadCommissionData();
+                }
+
                 closeWindow(event);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to Create Commission", "An error occurred while adding the commission. Please try again.");

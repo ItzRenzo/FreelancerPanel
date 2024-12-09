@@ -80,6 +80,7 @@ public class AllCommissionsController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        loadCommissionData();
     }
 
     // Setter for username
@@ -176,7 +177,7 @@ public class AllCommissionsController {
         }
     }
 
-    private void loadCommissionData() {
+    public void loadCommissionData() {
         // ObservableList to hold commission data
         ObservableList<Commission> commissions = FXCollections.observableArrayList();
 
@@ -487,6 +488,7 @@ public class AllCommissionsController {
 
             NewCommissionController newCommissionController = loader.getController();
             newCommissionController.setUserId(userId);
+            newCommissionController.setAllCommissionsController(this);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);

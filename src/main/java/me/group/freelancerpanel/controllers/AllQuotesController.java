@@ -1,12 +1,13 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -16,8 +17,39 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class AllQuotesController {
+
+    @FXML
+    private TableView<Quote> quoteTable;
+
+    @FXML
+    private TableColumn<Quote, Integer> QuoteID;
+
+    @FXML
+    private TableColumn<Quote, String> QuoteTitle;
+
+    @FXML
+    private TableColumn<Quote, String> QuoteClient;
+
+    @FXML
+    private TableColumn<Quote, Double> QuoteProposedPrice;
+
+    @FXML
+    private TableColumn<Quote, String> QuoteStartDate;
+
+    @FXML
+    private TableColumn<Quote, String> QuoteDeadline;
+
+    @FXML
+    private TableColumn<Quote, String> QuotePaymentTerms;
+
+    @FXML
+    private TableColumn<Quote, String> QuoteStatus;
 
     @FXML
     private TreeView<String> CommissionTree;
@@ -42,6 +74,8 @@ public class AllQuotesController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        System.out.println("AllQuotesController: User ID set to " + userId);
+        loadQuoteData();
     }
 
     // Setter for username
@@ -78,6 +112,27 @@ public class AllQuotesController {
         initializeRequestTree();
         initializeQuotesTree();
 
+        QuoteID.setStyle("-fx-text-fill: white;");
+        QuoteTitle.setStyle("-fx-text-fill: white;");
+        QuoteClient.setStyle("-fx-text-fill: white;");
+        QuoteProposedPrice.setStyle("-fx-text-fill: white;");
+        QuoteStartDate.setStyle("-fx-text-fill: white;");
+        QuoteDeadline.setStyle("-fx-text-fill: white;");
+        QuotePaymentTerms.setStyle("-fx-text-fill: white;");
+        QuoteStatus.setStyle("-fx-text-fill: white;");
+
+        QuoteID.setCellValueFactory(cellData -> cellData.getValue().quoteIdProperty().asObject());
+        QuoteTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        QuoteClient.setCellValueFactory(cellData -> cellData.getValue().clientNameProperty());
+        QuoteProposedPrice.setCellValueFactory(cellData -> cellData.getValue().proposedPriceProperty().asObject());
+        QuoteStartDate.setCellValueFactory(cellData -> cellData.getValue().startDateProperty());
+        QuoteDeadline.setCellValueFactory(cellData -> cellData.getValue().deadlineProperty());
+        QuotePaymentTerms.setCellValueFactory(cellData -> cellData.getValue().paymentTermsProperty());
+        QuoteStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+
+        // Load data into the table
+        loadQuoteData();
+
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
                 loadAllCommissionsView();
@@ -112,6 +167,45 @@ public class AllQuotesController {
         if (email != null) {
             User_email.setText(email);
         }
+    }
+
+    public void loadQuoteData() {
+        ObservableList<Quote> quotes = FXCollections.observableArrayList();
+
+        String query = "SELECT q.quote_id, q.quote_title, c.client_name, q.quote_price, q.quote_start_date, " +
+                "q.quote_deadline, q.quote_payment_terms, q.quote_status " +
+                "FROM quote q " +
+                "JOIN client c ON q.client_id = c.client_id " +
+                "WHERE q.user_id = ?";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int quoteId = resultSet.getInt("quote_id");
+                String title = resultSet.getString("quote_title");
+                String clientName = resultSet.getString("client_name");
+                double proposedPrice = resultSet.getDouble("quote_price");
+                String startDate = resultSet.getString("quote_start_date");
+                String deadline = resultSet.getString("quote_deadline");
+                String paymentTerms = resultSet.getString("quote_payment_terms");
+                String status = resultSet.getString("quote_status");
+
+                quotes.add(new Quote(quoteId, title, clientName, proposedPrice, startDate, deadline, paymentTerms, status));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database Error");
+            alert.setHeaderText("Failed to Load Quotes");
+            alert.setContentText("An error occurred while loading quotes: " + e.getMessage());
+            alert.showAndWait();
+        }
+        quoteTable.setItems(quotes);
     }
 
     @FXML
@@ -380,6 +474,10 @@ public class AllQuotesController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewQuote.fxml"));
             Parent adminRoot = loader.load();
+
+            NewQuoteController newQuoteController = loader.getController();
+            newQuoteController.setUserId(userId); // Set User ID
+            newQuoteController.setAllQuotesController(this);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);

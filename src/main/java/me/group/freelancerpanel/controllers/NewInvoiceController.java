@@ -35,6 +35,12 @@ public class NewInvoiceController {
     @FXML
     private TextArea MemoTA;
 
+    private InvoiceController invoiceController;
+
+    public void setInvoiceController(InvoiceController invoiceController) {
+        this.invoiceController = invoiceController;
+    }
+
     private int userId; // Store the current logged-in user's ID
 
     public void setUserId(int userId) {
@@ -154,6 +160,10 @@ public class NewInvoiceController {
                 alert.setHeaderText("Invoice Created");
                 alert.setContentText("The new invoice has been successfully added.");
                 alert.showAndWait();
+
+                if (invoiceController != null) {
+                    invoiceController.loadInvoiceData();
+                }
 
                 // Close the window after success
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

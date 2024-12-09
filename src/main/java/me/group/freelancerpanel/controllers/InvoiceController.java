@@ -182,7 +182,7 @@ public class InvoiceController {
         }
     }
 
-    private void loadInvoiceData() {
+    public void loadInvoiceData() {
         ObservableList<Invoice> invoices = FXCollections.observableArrayList();
 
         String query = "SELECT i.invoice_id, i.invoice_created_at, i.invoice_amount, i.invoice_status, " +
@@ -489,6 +489,7 @@ public class InvoiceController {
 
             NewInvoiceController controller = loader.getController();
             controller.setUserId(userId);
+            controller.setInvoiceController(this);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);

@@ -164,16 +164,16 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1000.0">
                            <children>
-                              <TableView layoutY="-1.0" prefHeight="520.0" prefWidth="1000.0" stylesheets="@tableview.css">
+                              <TableView fx:id="quoteTable" layoutY="-1.0" prefHeight="520.0" prefWidth="1000.0" stylesheets="@tableview.css">
                                 <columns>
-                                  <TableColumn text="# ID" />
-                                  <TableColumn prefWidth="190.0" text="Title" />
-                                    <TableColumn prefWidth="120.0" text="For Client" />
-                                    <TableColumn prefWidth="120.0" text="Proposed Price" />
-                                    <TableColumn prefWidth="120.0" text="Start Date" />
-                                    <TableColumn prefWidth="120.0" text="Deadline" />
-                                    <TableColumn prefWidth="120.0" text="Payment terms" />
-                                    <TableColumn prefWidth="120.0" text="Status" />
+                                  <TableColumn fx:id="QuoteID" text="# ID" />
+                                  <TableColumn fx:id="QuoteTitle" prefWidth="190.0" text="Title" />
+                                    <TableColumn fx:id="QuoteClient" prefWidth="120.0" text="For Client" />
+                                    <TableColumn fx:id="QuoteProposedPrice" prefWidth="120.0" text="Proposed Price" />
+                                    <TableColumn fx:id="QuoteStartDate" prefWidth="120.0" text="Start Date" />
+                                    <TableColumn fx:id="QuoteDeadline" prefWidth="120.0" text="Deadline" />
+                                    <TableColumn fx:id="QuotePaymentTerms" prefWidth="120.0" text="Payment terms" />
+                                    <TableColumn fx:id="QuoteStatus" prefWidth="120.0" text="Status" />
                                 </columns>
                               </TableView>
                            </children>
