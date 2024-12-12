@@ -17,6 +17,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -435,6 +436,31 @@ public class ProductController {
             System.err.println("Error loading Product.fxml: " + e.getMessage());
         }
     }
+
+    public void EditClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/ID_GUI.fxml"));
+            Parent idRoot = loader.load();
+
+            IDGUIController idController = loader.getController();
+            idController.setCategoryName("Product"); // Set category name to "Product"
+            idController.setProductsController(this); // Pass reference for further actions
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(idRoot));
+            stage.setTitle("Enter Product ID");
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to Load ID GUI");
+            alert.setContentText("An error occurred while loading the ID GUI: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
 
     public void NewClicked(MouseEvent event) {
         try {
