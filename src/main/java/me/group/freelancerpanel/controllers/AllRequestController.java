@@ -1,12 +1,13 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -16,8 +17,40 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class AllRequestController {
+
+    @FXML
+    private TableView<Request> requestTable;
+
+    @FXML
+    private TableColumn<Request, Integer> RequestID;
+
+    @FXML
+    private TableColumn<Request, String> RequestDescription;
+
+    @FXML
+    private TableColumn<Request, String> RequestCommission;
+
+    @FXML
+    private TableColumn<Request, Double> RequestOfferedAmount;
+
+    @FXML
+    private TableColumn<Request, Double> RequestPaid;
+
+    @FXML
+    private TableColumn<Request, String> RequestDeadline;
+
+    @FXML
+    private TableColumn<Request, String> RequestSubmittedat;
+
+    @FXML
+    private TableColumn<Request, String> RequestStatus;
+
     @FXML
     private TreeView<String> CommissionTree;
     @FXML
@@ -41,6 +74,8 @@ public class AllRequestController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
+        System.out.println("AllRequestController: User ID set to " + userId);
+        loadRequestData();
     }
 
     // Setter for username
@@ -77,6 +112,28 @@ public class AllRequestController {
         initializeRequestTree();
         initializeQuotesTree();
 
+        RequestID.setStyle("-fx-text-fill: white;");
+        RequestDescription.setStyle("-fx-text-fill: white;");
+        RequestCommission.setStyle("-fx-text-fill: white;");
+        RequestOfferedAmount.setStyle("-fx-text-fill: white;");
+        RequestPaid.setStyle("-fx-text-fill: white;");
+        RequestDeadline.setStyle("-fx-text-fill: white;");
+        RequestSubmittedat.setStyle("-fx-text-fill: white;");
+        RequestStatus.setStyle("-fx-text-fill: white;");
+
+        // Bind columns to Request properties
+        RequestID.setCellValueFactory(cellData -> cellData.getValue().requestIdProperty().asObject());
+        RequestDescription.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
+        RequestCommission.setCellValueFactory(cellData -> cellData.getValue().commissionTitleProperty());
+        RequestOfferedAmount.setCellValueFactory(cellData -> cellData.getValue().offeredAmountProperty().asObject());
+        RequestPaid.setCellValueFactory(cellData -> cellData.getValue().paidProperty().asObject());
+        RequestDeadline.setCellValueFactory(cellData -> cellData.getValue().deadlineProperty());
+        RequestSubmittedat.setCellValueFactory(cellData -> cellData.getValue().submittedAtProperty());
+        RequestStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+
+        // Load data into the table
+        loadRequestData();
+
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
                 loadAllCommissionsView();
@@ -111,6 +168,47 @@ public class AllRequestController {
         if (email != null) {
             User_email.setText(email);
         }
+    }
+
+    public void loadRequestData() {
+        ObservableList<Request> requests = FXCollections.observableArrayList();
+        String query = """
+            SELECT r.request_id, r.request_description, c.commission_title, r.request_offered_amount,
+                   r.request_paid, r.request_deadline, r.request_submitted_at, r.request_status
+            FROM request r
+            JOIN commission c ON r.commission_id = c.commission_id
+            WHERE r.user_id = ?
+            """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId); // Filter by logged-in user
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                requests.add(new Request(
+                        resultSet.getInt("request_id"),
+                        resultSet.getString("request_description"),
+                        resultSet.getString("commission_title"),
+                        resultSet.getDouble("request_offered_amount"),
+                        resultSet.getDouble("request_paid"),
+                        resultSet.getString("request_deadline"),
+                        resultSet.getString("request_submitted_at"),
+                        resultSet.getString("request_status")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database Error");
+            alert.setHeaderText("Failed to Load Requests");
+            alert.setContentText("An error occurred while loading requests: " + e.getMessage());
+            alert.showAndWait();
+        }
+
+        requestTable.setItems(requests);
     }
 
     @FXML

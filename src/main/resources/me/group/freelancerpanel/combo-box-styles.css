@@ -1,0 +1,18 @@
+.combo-box {
+    -fx-background-color: #282828; /* Background color for the main combo box */
+    -fx-text-fill: white; /* Text color for selected item */
+}
+
+.combo-box .text-field {
+    -fx-text-fill: white; /* Text color for input area */
+    -fx-background-color: #282828; /* Background color for input area */
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: white; /* Text color for items in the dropdown */
+    -fx-background-color: #282828; /* Background color for dropdown items */
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #383838; /* Highlight color for hovered item */
+}
