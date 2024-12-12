@@ -97,7 +97,7 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox fx:id="PaymentTermsComboBox" layoutX="224.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="PaymentTermsComboBox" layoutX="224.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@combo-box-styles.css" />
       <DatePicker fx:id="StartDate" layoutX="433.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="433.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Date">
          <font>
@@ -109,7 +109,7 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox fx:id="StatusComboBox" layoutX="433.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="StatusComboBox" layoutX="433.0" layoutY="273.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@combo-box-styles.css" />
       <Text fill="WHITE" layoutX="433.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Status">
          <font>
             <Font name="Calibri Bold" size="18.0" />
@@ -120,6 +120,6 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox fx:id="ClientComboBox" layoutX="14.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="ClientComboBox" layoutX="14.0" layoutY="200.0" prefHeight="25.0" prefWidth="180.0" stylesheets="@combo-box-styles.css" />
    </children>
 </Pane>

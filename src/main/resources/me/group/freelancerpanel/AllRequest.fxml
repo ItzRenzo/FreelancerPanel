@@ -164,16 +164,16 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1000.0">
                            <children>
-                              <TableView layoutY="-1.0" prefHeight="520.0" prefWidth="1000.0" stylesheets="@tableview.css">
+                              <TableView fx:id="requestTable" layoutY="-1.0" prefHeight="520.0" prefWidth="1000.0" stylesheets="@tableview.css">
                                 <columns>
-                                  <TableColumn text="# ID" />
-                                  <TableColumn prefWidth="190.0" text="Title" />
-                                    <TableColumn prefWidth="120.0" text="Commission" />
-                                    <TableColumn prefWidth="120.0" text="Offered Amount" />
-                                    <TableColumn prefWidth="120.0" text="Paid" />
-                                    <TableColumn prefWidth="120.0" text="Deadline" />
-                                    <TableColumn prefWidth="120.0" text="Submitted at" />
-                                    <TableColumn prefWidth="120.0" text="Status" />
+                                  <TableColumn fx:id="RequestID" text="# ID" />
+                                  <TableColumn fx:id="RequestDescription" prefWidth="190.0" text="Description" />
+                                    <TableColumn fx:id="RequestCommission" prefWidth="120.0" text="Commission" />
+                                    <TableColumn fx:id="RequestOfferedAmount" prefWidth="120.0" text="Offered Amount" />
+                                    <TableColumn fx:id="RequestPaid" prefWidth="120.0" text="Paid" />
+                                    <TableColumn fx:id="RequestDeadline" prefWidth="120.0" text="Deadline" />
+                                    <TableColumn fx:id="RequestSubmittedat" prefWidth="120.0" text="Submitted at" />
+                                    <TableColumn fx:id="RequestStatus" prefWidth="120.0" text="Status" />
                                 </columns>
                               </TableView>
                            </children>

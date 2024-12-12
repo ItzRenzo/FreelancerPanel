@@ -97,7 +97,7 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox fx:id="StatusComboBox" layoutX="314.0" layoutY="273.0" prefHeight="25.0" prefWidth="270.0" style="-fx-background-color: #282828;" />
-      <ComboBox fx:id="CommissionComboBox" layoutX="314.0" layoutY="200.0" prefHeight="25.0" prefWidth="270.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="StatusComboBox" layoutX="314.0" layoutY="273.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@combo-box-styles.css" />
+      <ComboBox fx:id="CommissionComboBox" layoutX="314.0" layoutY="200.0" prefHeight="25.0" prefWidth="270.0" stylesheets="@combo-box-styles.css" />
    </children>
 </Pane>

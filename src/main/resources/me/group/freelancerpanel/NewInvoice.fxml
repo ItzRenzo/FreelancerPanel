@@ -86,7 +86,7 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox fx:id="StatusComboBox" layoutX="354.0" layoutY="238.0" prefHeight="25.0" prefWidth="311.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="StatusComboBox" layoutX="354.0" layoutY="238.0" prefHeight="25.0" prefWidth="311.0" stylesheets="@combo-box-styles.css" />
       <DatePicker fx:id="Deadline" layoutX="22.0" layoutY="238.0" prefHeight="22.0" prefWidth="311.0" stylesheets="@allcolors.css" />
       <TextArea fx:id="TitleTA" layoutX="22.0" layoutY="315.0" prefHeight="83.0" prefWidth="647.0" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="22.0" layoutY="287.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Title">
@@ -99,13 +99,13 @@
             <Font name="Calibri Bold" size="14.0" />
          </font>
       </Text>
-      <ComboBox fx:id="PaymentMethodComboBox" layoutX="20.0" layoutY="95.0" prefHeight="25.0" prefWidth="641.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="PaymentMethodComboBox" layoutX="20.0" layoutY="95.0" prefHeight="25.0" prefWidth="641.0" stylesheets="@combo-box-styles.css" />
       <Text fill="WHITE" layoutX="18.0" layoutY="88.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Payment Method">
          <font>
             <Font name="Calibri Bold" size="18.0" />
          </font>
       </Text>
-      <ComboBox fx:id="ClientComboBox" layoutX="22.0" layoutY="168.0" prefHeight="25.0" prefWidth="311.0" style="-fx-background-color: #282828;" />
+      <ComboBox fx:id="ClientComboBox" layoutX="22.0" layoutY="168.0" prefHeight="25.0" prefWidth="311.0" stylesheets="@combo-box-styles.css" />
       <TextArea fx:id="MemoTA" layoutX="22.0" layoutY="459.0" prefHeight="83.0" prefWidth="647.0" stylesheets="@allcolors.css" />
       <Text fill="#a9a9a9" layoutX="22.0" layoutY="448.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add a longer description for this invoice. Visible to the client. Great for adding terms or other details.">
          <font>
