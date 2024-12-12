@@ -459,6 +459,30 @@ public class ClientsController {
         }
     }
 
+    public void EditClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/ID_GUI.fxml"));
+            Parent idRoot = loader.load();
+
+            IDGUIController idController = loader.getController();
+            idController.setCategoryName("Client"); // Set category name to "Product"
+            idController.setClientsController(this); // Pass reference for further actions
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(idRoot));
+            stage.setTitle("Enter Client ID");
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to Load ID GUI");
+            alert.setContentText("An error occurred while loading the ID GUI: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
     public void NewClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewClient.fxml"));

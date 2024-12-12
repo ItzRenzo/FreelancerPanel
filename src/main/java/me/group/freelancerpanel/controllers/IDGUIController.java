@@ -27,7 +27,8 @@ public class IDGUIController {
     private TextField IDInputField;
 
     private String categoryName; // For dynamic titles like "Product ID"
-    private ProductController productsController; // Reference to the calling controller
+    private ProductController productsController; // Reference for ProductController
+    private ClientsController clientsController; // Reference for ClientsController
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
@@ -49,6 +50,10 @@ public class IDGUIController {
         this.productsController = productsController;
     }
 
+    public void setClientsController(ClientsController clientsController) {
+        this.clientsController = clientsController;
+    }
+
     public void EnterClicked(MouseEvent event) {
         String enteredID = IDInputField.getText();
 
@@ -56,29 +61,44 @@ public class IDGUIController {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Invalid Input");
             alert.setHeaderText("No ID Entered");
-            alert.setContentText("Please enter a valid Product ID to proceed.");
+            alert.setContentText("Please enter a valid ID to proceed.");
             alert.showAndWait();
             return;
         }
 
         try {
-            // Pass the Product ID to the editing GUI
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditProduct.fxml"));
-            Parent editRoot = loader.load();
+            FXMLLoader loader;
+            Parent editRoot;
 
-            EditProductController editController = loader.getController();
-            editController.setProductID(Integer.parseInt(enteredID));
-            editController.setProductsController(productsController);
+            // Load the appropriate editing GUI based on the controller reference
+            if (productsController != null) {
+                loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditProduct.fxml"));
+                editRoot = loader.load();
+
+                EditProductController editController = loader.getController();
+                editController.setProductID(Integer.parseInt(enteredID));
+                editController.setProductsController(productsController);
+            } else if (clientsController != null) {
+                loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditClient.fxml"));
+                editRoot = loader.load();
+
+                EditClientController editController = loader.getController();
+                editController.setClientID(Integer.parseInt(enteredID));
+                editController.setClientsController(clientsController);
+            } else {
+                throw new IllegalStateException("No controller reference set!");
+            }
 
             Stage stage = new Stage();
             stage.setScene(new Scene(editRoot));
-            stage.setTitle("Edit Product");
+            stage.setTitle("Edit " + categoryName);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
 
             // Close the ID GUI after loading the edit screen
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
+
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
