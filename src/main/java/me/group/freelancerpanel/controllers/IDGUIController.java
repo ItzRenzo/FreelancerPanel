@@ -29,6 +29,13 @@ public class IDGUIController {
     private String categoryName; // For dynamic titles like "Product ID"
     private ProductController productsController; // Reference for ProductController
     private ClientsController clientsController; // Reference for ClientsController
+    private AllCommissionsController allcommissionController; // Reference for ClientsController
+
+    private int userId;
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
@@ -52,6 +59,10 @@ public class IDGUIController {
 
     public void setClientsController(ClientsController clientsController) {
         this.clientsController = clientsController;
+    }
+
+    public void setAllCommissionsController(AllCommissionsController allcommissionController) {
+        this.allcommissionController = allcommissionController;
     }
 
     public void EnterClicked(MouseEvent event) {
@@ -85,6 +96,14 @@ public class IDGUIController {
                 EditClientController editController = loader.getController();
                 editController.setClientID(Integer.parseInt(enteredID));
                 editController.setClientsController(clientsController);
+            } else if (allcommissionController != null) {
+                loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditCommission.fxml"));
+                editRoot = loader.load();
+
+                EditCommissionController editController = loader.getController();
+                editController.setCommissionID(Integer.parseInt(enteredID));
+                editController.setUserId(userId);
+                editController.setCommissionController(allcommissionController);
             } else {
                 throw new IllegalStateException("No controller reference set!");
             }
