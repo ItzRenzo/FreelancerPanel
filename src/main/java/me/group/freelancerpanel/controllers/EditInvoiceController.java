@@ -35,14 +35,14 @@ public class EditInvoiceController {
     @FXML
     private TextArea MemoTA;
 
-    private int invoiceId; // ID of the invoice being edited
-    private InvoiceController invoiceController; // Reference to the parent controller
+    private int invoiceId;
+    private InvoiceController invoiceController;
 
     private int userId;
 
     public void setInvoiceId(int invoiceId) {
         this.invoiceId = invoiceId;
-        loadInvoiceData(); // Load invoice details
+        loadInvoiceData();
     }
 
     public void setUserId(int userId) {
@@ -82,6 +82,23 @@ public class EditInvoiceController {
                 ClientComboBox.getItems().add(client);
             }
 
+            // Configure ComboBox to display client names
+            ClientComboBox.setCellFactory(param -> new ListCell<>() {
+                @Override
+                protected void updateItem(Client client, boolean empty) {
+                    super.updateItem(client, empty);
+                    setText(empty || client == null ? null : client.getName());
+                }
+            });
+
+            ClientComboBox.setButtonCell(new ListCell<>() {
+                @Override
+                protected void updateItem(Client client, boolean empty) {
+                    super.updateItem(client, empty);
+                    setText(empty || client == null ? null : client.getName());
+                }
+            });
+
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to load clients: " + e.getMessage());
@@ -89,12 +106,11 @@ public class EditInvoiceController {
     }
 
     private void loadPaymentMethods() {
-        // Example predefined payment methods
         PaymentMethodComboBox.getItems().addAll("Bank Transfer", "PayPal", "Credit Card", "Cash");
     }
 
     private void loadInvoiceData() {
-        String query = "SELECT client_id, invoice_amount, invoice_due_at, invoice_status, invoice_title, invoice_memo, invoice_payment_link " +
+        String query = "SELECT client_id, invoice_amount, invoice_due_at, invoice_status, invoice_title, invoice_memo, invoice_open_account " +
                 "FROM invoice WHERE invoice_id = ?";
 
         try (Connection connection = DatabaseHandler.getConnection();
@@ -104,7 +120,6 @@ public class EditInvoiceController {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                // Populate the fields with the existing data
                 int clientId = resultSet.getInt("client_id");
                 Client client = getClientById(clientId);
                 if (client != null) {
@@ -116,7 +131,7 @@ public class EditInvoiceController {
                 StatusComboBox.setValue(resultSet.getString("invoice_status"));
                 TitleTA.setText(resultSet.getString("invoice_title"));
                 MemoTA.setText(resultSet.getString("invoice_memo"));
-                PaymentMethodComboBox.setValue(resultSet.getString("invoice_payment_link"));
+                PaymentMethodComboBox.setValue(resultSet.getString("invoice_open_account"));
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Invoice not found.");
             }
@@ -173,23 +188,23 @@ public class EditInvoiceController {
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
-            preparedStatement.setInt(1, selectedClient.getId()); // Client ID
-            preparedStatement.setDouble(2, Double.parseDouble(totalValue)); // Invoice amount
-            preparedStatement.setDate(3, java.sql.Date.valueOf(deadline)); // Invoice due date
-            preparedStatement.setString(4, status); // Invoice status
-            preparedStatement.setString(5, title); // Invoice title
-            preparedStatement.setString(6, memo); // Invoice memo
-            preparedStatement.setString(7, paymentMethod); // Payment method
-            preparedStatement.setString(8, status); // Condition for updating invoice_paid_at
-            preparedStatement.setInt(9, invoiceId); // Invoice ID
+            preparedStatement.setInt(1, selectedClient.getId());
+            preparedStatement.setDouble(2, Double.parseDouble(totalValue));
+            preparedStatement.setDate(3, java.sql.Date.valueOf(deadline));
+            preparedStatement.setString(4, status);
+            preparedStatement.setString(5, title);
+            preparedStatement.setString(6, memo);
+            preparedStatement.setString(7, paymentMethod);
+            preparedStatement.setString(8, status);
+            preparedStatement.setInt(9, invoiceId);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 1) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Invoice updated successfully.");
                 if (invoiceController != null) {
-                    invoiceController.loadInvoiceData(); // Refresh the invoice table
+                    invoiceController.loadInvoiceData();
                 }
-                closeWindow(event); // Close the current window
+                closeWindow(event);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to update invoice.");
             }
@@ -199,7 +214,6 @@ public class EditInvoiceController {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to update invoice: " + e.getMessage());
         }
     }
-
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);

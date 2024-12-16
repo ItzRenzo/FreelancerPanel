@@ -486,6 +486,7 @@ public class InvoiceController {
 
             IDGUIController idController = loader.getController();
             idController.setCategoryName("Invoice"); // Set category name to "Product"
+            idController.setUserId(userId);
             idController.setInvoiceController(this); // Pass reference for further actions
 
             Stage stage = new Stage();
