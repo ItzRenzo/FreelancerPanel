@@ -32,6 +32,7 @@ public class IDGUIController {
     private AllCommissionsController allcommissionController; // Reference for AllCommissionsController
     private InvoiceController invoiceController; // Reference for InvoiceController
     private AllRequestController allrequestController; // Reference for AllRequestController
+    private AllQuotesController allquotesController; // Reference for AllQuoteController
 
 
     private int userId;
@@ -76,6 +77,10 @@ public class IDGUIController {
 
     public void setAllRequestController(AllRequestController allrequestController) {
         this.allrequestController = allrequestController;
+    }
+
+    public void setAllQuotesController(AllQuotesController allquotesController) {
+        this.allquotesController = allquotesController;
     }
 
     // Handle the "Enter" button click
@@ -130,6 +135,14 @@ public class IDGUIController {
                 editController.setRequestId(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setAllRequestController(allrequestController);
+            } else if (allquotesController != null) {
+                loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditQuote.fxml"));
+                editRoot = loader.load();
+
+                EditQuoteController editController = loader.getController();
+                editController.setQuoteId(Integer.parseInt(enteredID));
+                editController.setUserId(userId);
+                editController.setAllQuotesController(allquotesController);
             } else {
                 throw new IllegalStateException("No controller reference set!");
             }
