@@ -7,10 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -479,6 +476,30 @@ public class InvoiceController {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error loading Product.fxml: " + e.getMessage());
+        }
+    }
+
+    public void EditClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/ID_GUI.fxml"));
+            Parent idRoot = loader.load();
+
+            IDGUIController idController = loader.getController();
+            idController.setCategoryName("Invoice"); // Set category name to "Product"
+            idController.setInvoiceController(this); // Pass reference for further actions
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(idRoot));
+            stage.setTitle("Enter Invoice ID");
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Failed to Load ID GUI");
+            alert.setContentText("An error occurred while loading the ID GUI: " + e.getMessage());
+            alert.showAndWait();
         }
     }
 

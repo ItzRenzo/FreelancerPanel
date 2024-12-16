@@ -29,30 +29,33 @@ public class IDGUIController {
     private String categoryName; // For dynamic titles like "Product ID"
     private ProductController productsController; // Reference for ProductController
     private ClientsController clientsController; // Reference for ClientsController
-    private AllCommissionsController allcommissionController; // Reference for ClientsController
+    private AllCommissionsController allcommissionController; // Reference for AllCommissionsController
+    private InvoiceController invoiceController; // Reference for InvoiceController
 
     private int userId;
 
+    // Set the user ID
     public void setUserId(int userId) {
         this.userId = userId;
     }
 
+    // Set the category name and update the UI text
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
         Text idText = new Text(categoryName + " ID");
         idText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // Dynamically update the label text
         Text enterIDText = new Text("Enter " + categoryName + " ID:");
         enterIDText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;");
 
         IDText.getChildren().clear();
-        IDText.getChildren().addAll(idText);
+        IDText.getChildren().add(idText);
 
         EnterIDText.getChildren().clear();
-        EnterIDText.getChildren().addAll(enterIDText);
+        EnterIDText.getChildren().add(enterIDText);
     }
 
+    // Setters for the different controllers
     public void setProductsController(ProductController productsController) {
         this.productsController = productsController;
     }
@@ -65,15 +68,16 @@ public class IDGUIController {
         this.allcommissionController = allcommissionController;
     }
 
+    public void setInvoiceController(InvoiceController invoiceController) {
+        this.invoiceController = invoiceController;
+    }
+
+    // Handle the "Enter" button click
     public void EnterClicked(MouseEvent event) {
         String enteredID = IDInputField.getText();
 
         if (enteredID == null || enteredID.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Invalid Input");
-            alert.setHeaderText("No ID Entered");
-            alert.setContentText("Please enter a valid ID to proceed.");
-            alert.showAndWait();
+            showAlert(Alert.AlertType.WARNING, "Invalid Input", "No ID Entered", "Please enter a valid ID to proceed.");
             return;
         }
 
@@ -81,7 +85,7 @@ public class IDGUIController {
             FXMLLoader loader;
             Parent editRoot;
 
-            // Load the appropriate editing GUI based on the controller reference
+            // Determine which editor to load based on the set controller
             if (productsController != null) {
                 loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditProduct.fxml"));
                 editRoot = loader.load();
@@ -104,32 +108,51 @@ public class IDGUIController {
                 editController.setCommissionID(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setCommissionController(allcommissionController);
+            } else if (invoiceController != null) {
+                loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditInvoice.fxml"));
+                editRoot = loader.load();
+
+                EditInvoiceController editController = loader.getController();
+                editController.setInvoiceId(Integer.parseInt(enteredID));
+                editController.setUserId(userId);
+                editController.setInvoiceController(invoiceController);
             } else {
                 throw new IllegalStateException("No controller reference set!");
             }
 
+            // Open the editor window
             Stage stage = new Stage();
             stage.setScene(new Scene(editRoot));
             stage.setTitle("Edit " + categoryName);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
 
-            // Close the ID GUI after loading the edit screen
-            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            currentStage.close();
+            // Close the current window
+            closeWindow(event);
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Failed to Load Edit GUI");
-            alert.setContentText("An error occurred while loading the Edit GUI: " + e.getMessage());
-            alert.showAndWait();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to Load Edit GUI", "An error occurred: " + e.getMessage());
         }
     }
 
+    // Close the current window
     public void CloseClicked(MouseEvent event) {
+        closeWindow(event);
+    }
+
+    // Helper to close the window
+    private void closeWindow(MouseEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
+    }
+
+    // Helper to show an alert
+    private void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
