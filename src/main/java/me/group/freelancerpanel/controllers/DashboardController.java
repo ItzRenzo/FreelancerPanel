@@ -250,13 +250,13 @@ public class DashboardController {
         PopularProductsPieChart.getData().clear(); // Clear old data
 
         String query = """
-        SELECT product_name, COUNT(commission.commission_id) AS total_commissions
-        FROM product
-        JOIN commission ON product.product_id = commission.product_id
-        WHERE commission.user_id = ? AND commission.commission_status = 'Completed'
-        GROUP BY product_name
-        ORDER BY total_commissions DESC
-        LIMIT 5;
+    SELECT product_name, COUNT(commission.commission_id) AS total_commissions
+    FROM product
+    JOIN commission ON product.product_id = commission.product_id
+    WHERE commission.user_id = ? AND commission.commission_status = 'Completed'
+    GROUP BY product_name
+    ORDER BY total_commissions DESC
+    LIMIT 5;
     """;
 
         try (Connection connection = DatabaseHandler.getConnection();
@@ -269,13 +269,17 @@ public class DashboardController {
                 String productName = resultSet.getString("product_name");
                 int totalCommissions = resultSet.getInt("total_commissions");
 
-                PopularProductsPieChart.getData().add(new PieChart.Data(productName, totalCommissions));
+                PieChart.Data data = new PieChart.Data(productName, totalCommissions);
+                PopularProductsPieChart.getData().add(data);
+
+                data.getNode().setStyle("-fx-text-fill: white;");
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
 
 

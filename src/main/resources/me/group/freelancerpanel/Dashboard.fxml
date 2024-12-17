@@ -186,7 +186,7 @@
                               <Font name="Century Gothic Bold" size="14.0" />
                            </font>
                         </Text>
-                        <PieChart fx:id="PopularProductsPieChart" layoutX="47.0" layoutY="40.0" prefHeight="206.0" prefWidth="260.0" />
+                        <PieChart fx:id="PopularProductsPieChart" layoutX="47.0" layoutY="40.0" prefHeight="206.0" prefWidth="260.0" stylesheets="@piechart.css" />
                      </children>
                   </AnchorPane>
                   <AnchorPane layoutX="46.0" layoutY="596.0" prefHeight="258.0" prefWidth="786.0" style="-fx-background-radius: 15; -fx-background-color: #282828;">
