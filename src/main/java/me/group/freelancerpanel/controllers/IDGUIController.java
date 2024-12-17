@@ -30,11 +30,15 @@ public class IDGUIController {
     private ProductController productsController; // Reference for ProductController
     private ClientsController clientsController; // Reference for ClientsController
     private AllCommissionsController allcommissionController; // Reference for AllCommissionsController
-    private ActiveCommissionsController activecommissionsController; // Reference for AllCommissionsController
-    private UnstartedCommissionsController unstartedcommissionsController; // Reference for AllCommissionsController
+    private ActiveCommissionsController activecommissionsController; // Reference for ActiveCommissionsController
+    private UnstartedCommissionsController unstartedcommissionsController; // Reference for UnstartedCommissionsController
     private InvoiceController invoiceController; // Reference for InvoiceController
     private AllRequestController allrequestController; // Reference for AllRequestController
+    private PendingRequestController pendingrequestController; // Reference for PendingRequestController
+    private CompletedRequestController completedrequestController; // Reference for CompletedRequestController
     private AllQuotesController allquotesController; // Reference for AllQuoteController
+    private PendingQuotesController pendingquotesController; // Reference for PendingQuoteController
+    private AcceptedQuotesController acceptedquotesController; // Reference for AcceptedQuoteController
 
 
     private int userId;
@@ -89,8 +93,24 @@ public class IDGUIController {
         this.allrequestController = allrequestController;
     }
 
+    public void setPendingRequestController(PendingRequestController pendingrequestController) {
+        this.pendingrequestController = pendingrequestController;
+    }
+
+    public void setCompletedRequestController(CompletedRequestController completedrequestController) {
+        this.completedrequestController = completedrequestController;
+    }
+
     public void setAllQuotesController(AllQuotesController allquotesController) {
         this.allquotesController = allquotesController;
+    }
+
+    public void setPendingQuotesController(PendingQuotesController pendingquotesController) {
+        this.pendingquotesController = pendingquotesController;
+    }
+
+    public void setAcceptedQuotesController(AcceptedQuotesController acceptedquotesController) {
+        this.acceptedquotesController = acceptedquotesController;
     }
 
     // Handle the "Enter" button click
@@ -137,7 +157,7 @@ public class IDGUIController {
                 editController.setInvoiceId(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setInvoiceController(invoiceController);
-            } else if (allrequestController != null) {
+            } else if (allrequestController != null || pendingrequestController != null || completedrequestController != null) {
                 loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditRequest.fxml"));
                 editRoot = loader.load();
 
@@ -145,7 +165,7 @@ public class IDGUIController {
                 editController.setRequestId(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setAllRequestController(allrequestController);
-            } else if (allquotesController != null) {
+            } else if (allquotesController != null || pendingquotesController != null || acceptedquotesController != null) {
                 loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditQuote.fxml"));
                 editRoot = loader.load();
 

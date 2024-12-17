@@ -40,9 +40,19 @@ public class NewQuoteController {
     private ComboBox StatusComboBox;
 
     private AllQuotesController allquotesController;
+    private PendingQuotesController pendingquotesController;
+    private AcceptedQuotesController acceptedquotesController;
 
     public void setAllQuotesController(AllQuotesController allquotesController) {
         this.allquotesController = allquotesController;
+    }
+
+    public void setPendingQuotesController(PendingQuotesController pendingquotesController) {
+        this.pendingquotesController = pendingquotesController;
+    }
+
+    public void setAcceptedQuotesController(AcceptedQuotesController acceptedquotesController) {
+        this.acceptedquotesController = acceptedquotesController;
     }
 
     private int userId; // Store the current logged-in user's ID

@@ -32,9 +32,19 @@ public class NewRequestController {
     private ComboBox<String> StatusComboBox;
 
     private AllRequestController allrequestController;
+    private PendingRequestController pendingrequestController;
+    private CompletedRequestController completedrequestController;
 
     public void setAllRequestController(AllRequestController allrequestController) {
         this.allrequestController = allrequestController;
+    }
+
+    public void setPendingRequestController(PendingRequestController pendingrequestController) {
+        this.pendingrequestController = pendingrequestController;
+    }
+
+    public void setCompletedRequestController(CompletedRequestController completedrequestController) {
+        this.completedrequestController = completedrequestController;
     }
 
     private int userId; // Store the current logged-in user's ID
@@ -56,7 +66,7 @@ public class NewRequestController {
 
     // Populate status ComboBox with predefined values
     private void initializeStatusComboBox() {
-        StatusComboBox.getItems().addAll("Not started", "In Progress", "Paused", "Rejected", "Completed", "Cancelled");
+        StatusComboBox.getItems().addAll("Not started", "In Progress", "Paused", "Rejected", "Requested", "Completed", "Cancelled");
     }
 
     // Populate the CommissionComboBox

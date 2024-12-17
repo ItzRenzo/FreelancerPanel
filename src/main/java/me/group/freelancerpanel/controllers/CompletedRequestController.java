@@ -22,31 +22,34 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ClientsController {
+public class CompletedRequestController {
 
     @FXML
-    private TableView<Client> clientTable;
+    private TableView<Request> requestTable;
 
     @FXML
-    private TableColumn<Client, Integer> ClientID;
+    private TableColumn<Request, Integer> RequestID;
 
     @FXML
-    private TableColumn<Client, String> ClientName;
+    private TableColumn<Request, String> RequestDescription;
 
     @FXML
-    private TableColumn<Client, String> ClientEmail;
+    private TableColumn<Request, String> RequestCommission;
 
     @FXML
-    private TableColumn<Client, String> ClientDiscord;
+    private TableColumn<Request, Double> RequestOfferedAmount;
 
     @FXML
-    private TableColumn<Client, Integer> ClientTotalCommission;
+    private TableColumn<Request, Double> RequestPaid;
 
     @FXML
-    private TableColumn<Client, Double> ClientTotalRevenue;
+    private TableColumn<Request, String> RequestDeadline;
 
     @FXML
-    private TableColumn<Client, String> ClientSince;
+    private TableColumn<Request, String> RequestSubmittedat;
+
+    @FXML
+    private TableColumn<Request, String> RequestStatus;
 
     @FXML
     private TreeView<String> CommissionTree;
@@ -74,10 +77,11 @@ public class ClientsController {
     private String username;
     private String email;
 
+    // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
-        System.out.println("ClientsController: User ID set to " + userId);
-        loadClientData(); // Ensure data is loaded after userId is set
+        System.out.println("AllRequestController: User ID set to " + userId);
+        loadRequestData();
         loadDashboardData();
     }
 
@@ -91,7 +95,7 @@ public class ClientsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Clients");
+            Text overviewText = new Text(" / Requests");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -111,26 +115,31 @@ public class ClientsController {
 
     @FXML
     public void initialize() {
-        // Set up the TableView columns
-        ClientID.setStyle("-fx-text-fill: white;");
-        ClientName.setStyle("-fx-text-fill: white;");
-        ClientEmail.setStyle("-fx-text-fill: white;");
-        ClientDiscord.setStyle("-fx-text-fill: white;");
-        ClientTotalCommission.setStyle("-fx-text-fill: white;");
-        ClientTotalRevenue.setStyle("-fx-text-fill: white;");
-        ClientSince.setStyle("-fx-text-fill: white;");
-
-        ClientID.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
-        ClientName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        ClientEmail.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
-        ClientDiscord.setCellValueFactory(cellData -> cellData.getValue().discordProperty());
-        ClientTotalCommission.setCellValueFactory(cellData -> cellData.getValue().totalCommissionProperty().asObject());
-        ClientTotalRevenue.setCellValueFactory(cellData -> cellData.getValue().totalRevenueProperty().asObject());
-        ClientSince.setCellValueFactory(cellData -> cellData.getValue().sinceProperty());
-
         initializeCommissionTree();
         initializeRequestTree();
         initializeQuotesTree();
+
+        RequestID.setStyle("-fx-text-fill: white;");
+        RequestDescription.setStyle("-fx-text-fill: white;");
+        RequestCommission.setStyle("-fx-text-fill: white;");
+        RequestOfferedAmount.setStyle("-fx-text-fill: white;");
+        RequestPaid.setStyle("-fx-text-fill: white;");
+        RequestDeadline.setStyle("-fx-text-fill: white;");
+        RequestSubmittedat.setStyle("-fx-text-fill: white;");
+        RequestStatus.setStyle("-fx-text-fill: white;");
+
+        // Bind columns to Request properties
+        RequestID.setCellValueFactory(cellData -> cellData.getValue().requestIdProperty().asObject());
+        RequestDescription.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
+        RequestCommission.setCellValueFactory(cellData -> cellData.getValue().commissionTitleProperty());
+        RequestOfferedAmount.setCellValueFactory(cellData -> cellData.getValue().offeredAmountProperty().asObject());
+        RequestPaid.setCellValueFactory(cellData -> cellData.getValue().paidProperty().asObject());
+        RequestDeadline.setCellValueFactory(cellData -> cellData.getValue().deadlineProperty());
+        RequestSubmittedat.setCellValueFactory(cellData -> cellData.getValue().submittedAtProperty());
+        RequestStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+
+        // Load data into the table
+        loadRequestData();
 
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
@@ -186,7 +195,7 @@ public class ClientsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Clients");
+            Text overviewText = new Text(" / Requests");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -256,41 +265,52 @@ public class ClientsController {
         alert.showAndWait();
     }
 
-    public void loadClientData() {
-        ObservableList<Client> clientList = FXCollections.observableArrayList();
+    public void loadRequestData() {
+        ObservableList<Request> requests = FXCollections.observableArrayList();
 
-        String query = "SELECT client_id, client_name, client_email, client_discord, client_total_commission, client_total_revenue, client_since " +
-                "FROM client WHERE user_id = ?";
+        // Updated query to filter for requests with status 'Completed'
+        String query = """
+            SELECT r.request_id, r.request_description, c.commission_title, r.request_offered_amount,
+                   r.request_paid, r.request_deadline, r.request_submitted_at, r.request_status
+            FROM request r
+            JOIN commission c ON r.commission_id = c.commission_id
+            WHERE r.user_id = ? AND r.request_status = ?  -- Added condition for 'Completed' status
+            """;
 
         try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            statement.setInt(1, userId); // Use the logged-in user's ID
-            ResultSet resultSet = statement.executeQuery();
+            preparedStatement.setInt(1, userId);  // Filter by logged-in user
+            preparedStatement.setString(2, "Completed");  // Filter for 'Completed' requests
+
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("client_id");
-                String name = resultSet.getString("client_name");
-                String email = resultSet.getString("client_email");
-                String discord = resultSet.getString("client_discord");
-                int totalCommission = resultSet.getInt("client_total_commission");
-                double totalRevenue = resultSet.getDouble("client_total_revenue");
-                String since = resultSet.getString("client_since");
-
-                clientList.add(new Client(id, name, email, discord, totalCommission, totalRevenue, since));
+                requests.add(new Request(
+                        resultSet.getInt("request_id"),
+                        resultSet.getString("request_description"),
+                        resultSet.getString("commission_title"),
+                        resultSet.getDouble("request_offered_amount"),
+                        resultSet.getDouble("request_paid"),
+                        resultSet.getString("request_deadline"),
+                        resultSet.getString("request_submitted_at"),
+                        resultSet.getString("request_status")
+                ));
             }
-
-            clientTable.setItems(clientList);
 
         } catch (SQLException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Database Error");
-            alert.setHeaderText("Failed to Load Clients");
-            alert.setContentText("An error occurred while loading client data.");
+            alert.setHeaderText("Failed to Load Requests");
+            alert.setContentText("An error occurred while loading requests: " + e.getMessage());
             alert.showAndWait();
         }
+
+        // Set the filtered list of requests to the TableView
+        requestTable.setItems(requests);
     }
+
 
     @FXML
     private void initializeCommissionTree() {
@@ -686,12 +706,13 @@ public class ClientsController {
             Parent idRoot = loader.load();
 
             IDGUIController idController = loader.getController();
-            idController.setCategoryName("Client"); // Set category name to "Product"
-            idController.setClientsController(this); // Pass reference for further actions
+            idController.setUserId(userId);
+            idController.setCategoryName("Request");
+            idController.setCompletedRequestController(this); // Pass reference for further actions
 
             Stage stage = new Stage();
             stage.setScene(new Scene(idRoot));
-            stage.setTitle("Enter Client ID");
+            stage.setTitle("Enter Request ID");
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
         } catch (IOException e) {
@@ -706,12 +727,12 @@ public class ClientsController {
 
     public void NewClicked(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewClient.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewRequest.fxml"));
             Parent adminRoot = loader.load();
 
-            NewClientController controller = loader.getController();
-            controller.setUserId(userId);
-            controller.setClientsController(this); // Pass the reference
+            NewRequestController newRequestController = loader.getController();
+            newRequestController.setUserId(userId); // Set User ID
+            newRequestController.setCompletedRequestController(this);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);
@@ -719,13 +740,12 @@ public class ClientsController {
             newStage.setResizable(false);
             newStage.initStyle(StageStyle.UNDECORATED);
             newStage.setScene(adminScene);
-            newStage.setTitle("New Client");
+            newStage.setTitle("New Request");
             newStage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error loading NewClient.fxml: " + e.getMessage());
+            System.err.println("Error loading NewRequest.fxml: " + e.getMessage());
         }
     }
-
-
 }
+

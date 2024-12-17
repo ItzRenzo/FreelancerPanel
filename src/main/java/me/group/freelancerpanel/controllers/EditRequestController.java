@@ -62,7 +62,7 @@ public class EditRequestController {
 
     // Populate status ComboBox with predefined values
     private void initializeStatusComboBox() {
-        StatusComboBox.getItems().addAll("Not started", "In Progress", "Paused", "Rejected", "Completed", "Cancelled");
+        StatusComboBox.getItems().addAll("Not started", "In Progress", "Paused", "Rejected", "Requested", "Completed", "Cancelled");
     }
 
     // Populate the CommissionComboBox

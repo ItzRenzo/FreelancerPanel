@@ -161,9 +161,29 @@ public class AllRequestController {
                 loadAllRequestView();
             }
         });
+        RequestTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("Pending requests")) {
+                loadPendingRequestView();
+            }
+        });
+        RequestTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("Completed requests")) {
+                loadCompletedRequestView();
+            }
+        });
         QuotesTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All quotes")) {
                 loadAllQuotesView();
+            }
+        });
+        QuotesTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("Pending quotes")) {
+                loadPendingQuotesView();
+            }
+        });
+        QuotesTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("Accepted quotes")) {
+                loadAcceptedQuotesView();
             }
         });
 
@@ -489,6 +509,48 @@ public class AllRequestController {
         }
     }
 
+    private void loadPendingRequestView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/PendingRequest.fxml"));
+            Parent adminRoot = loader.load();
+
+            PendingRequestController pendingrequestController = loader.getController();
+            pendingrequestController.setUserId(userId);
+            pendingrequestController.setUsername(username);
+            pendingrequestController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadCompletedRequestView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/CompletedRequest.fxml"));
+            Parent adminRoot = loader.load();
+
+            CompletedRequestController completedrequestController = loader.getController();
+            completedrequestController.setUserId(userId);
+            completedrequestController.setUsername(username);
+            completedrequestController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadAllQuotesView() {
         try {
             // Load the new FXML file
@@ -499,6 +561,48 @@ public class AllRequestController {
             allquotesController.setUserId(userId);
             allquotesController.setUsername(username);
             allquotesController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadPendingQuotesView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/PendingQuotes.fxml"));
+            Parent adminRoot = loader.load();
+
+            PendingQuotesController pendingquotesController = loader.getController();
+            pendingquotesController.setUserId(userId);
+            pendingquotesController.setUsername(username);
+            pendingquotesController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadAcceptedQuotesView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/AcceptedQuotes.fxml"));
+            Parent adminRoot = loader.load();
+
+            AcceptedQuotesController acceptedquotesController = loader.getController();
+            acceptedquotesController.setUserId(userId);
+            acceptedquotesController.setUsername(username);
+            acceptedquotesController.setUserEmail(email);
 
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();

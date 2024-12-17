@@ -22,31 +22,34 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ClientsController {
+public class AcceptedQuotesController {
 
     @FXML
-    private TableView<Client> clientTable;
+    private TableView<Quote> quoteTable;
 
     @FXML
-    private TableColumn<Client, Integer> ClientID;
+    private TableColumn<Quote, Integer> QuoteID;
 
     @FXML
-    private TableColumn<Client, String> ClientName;
+    private TableColumn<Quote, String> QuoteTitle;
 
     @FXML
-    private TableColumn<Client, String> ClientEmail;
+    private TableColumn<Quote, String> QuoteClient;
 
     @FXML
-    private TableColumn<Client, String> ClientDiscord;
+    private TableColumn<Quote, Double> QuoteProposedPrice;
 
     @FXML
-    private TableColumn<Client, Integer> ClientTotalCommission;
+    private TableColumn<Quote, String> QuoteStartDate;
 
     @FXML
-    private TableColumn<Client, Double> ClientTotalRevenue;
+    private TableColumn<Quote, String> QuoteDeadline;
 
     @FXML
-    private TableColumn<Client, String> ClientSince;
+    private TableColumn<Quote, String> QuotePaymentTerms;
+
+    @FXML
+    private TableColumn<Quote, String> QuoteStatus;
 
     @FXML
     private TreeView<String> CommissionTree;
@@ -74,10 +77,11 @@ public class ClientsController {
     private String username;
     private String email;
 
+    // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
-        System.out.println("ClientsController: User ID set to " + userId);
-        loadClientData(); // Ensure data is loaded after userId is set
+        System.out.println("AllQuotesController: User ID set to " + userId);
+        loadQuoteData();
         loadDashboardData();
     }
 
@@ -91,7 +95,7 @@ public class ClientsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Clients");
+            Text overviewText = new Text(" / Quotes");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -111,26 +115,30 @@ public class ClientsController {
 
     @FXML
     public void initialize() {
-        // Set up the TableView columns
-        ClientID.setStyle("-fx-text-fill: white;");
-        ClientName.setStyle("-fx-text-fill: white;");
-        ClientEmail.setStyle("-fx-text-fill: white;");
-        ClientDiscord.setStyle("-fx-text-fill: white;");
-        ClientTotalCommission.setStyle("-fx-text-fill: white;");
-        ClientTotalRevenue.setStyle("-fx-text-fill: white;");
-        ClientSince.setStyle("-fx-text-fill: white;");
-
-        ClientID.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
-        ClientName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        ClientEmail.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
-        ClientDiscord.setCellValueFactory(cellData -> cellData.getValue().discordProperty());
-        ClientTotalCommission.setCellValueFactory(cellData -> cellData.getValue().totalCommissionProperty().asObject());
-        ClientTotalRevenue.setCellValueFactory(cellData -> cellData.getValue().totalRevenueProperty().asObject());
-        ClientSince.setCellValueFactory(cellData -> cellData.getValue().sinceProperty());
-
         initializeCommissionTree();
         initializeRequestTree();
         initializeQuotesTree();
+
+        QuoteID.setStyle("-fx-text-fill: white;");
+        QuoteTitle.setStyle("-fx-text-fill: white;");
+        QuoteClient.setStyle("-fx-text-fill: white;");
+        QuoteProposedPrice.setStyle("-fx-text-fill: white;");
+        QuoteStartDate.setStyle("-fx-text-fill: white;");
+        QuoteDeadline.setStyle("-fx-text-fill: white;");
+        QuotePaymentTerms.setStyle("-fx-text-fill: white;");
+        QuoteStatus.setStyle("-fx-text-fill: white;");
+
+        QuoteID.setCellValueFactory(cellData -> cellData.getValue().quoteIdProperty().asObject());
+        QuoteTitle.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        QuoteClient.setCellValueFactory(cellData -> cellData.getValue().clientNameProperty());
+        QuoteProposedPrice.setCellValueFactory(cellData -> cellData.getValue().proposedPriceProperty().asObject());
+        QuoteStartDate.setCellValueFactory(cellData -> cellData.getValue().startDateProperty());
+        QuoteDeadline.setCellValueFactory(cellData -> cellData.getValue().deadlineProperty());
+        QuotePaymentTerms.setCellValueFactory(cellData -> cellData.getValue().paymentTermsProperty());
+        QuoteStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+
+        // Load data into the table
+        loadQuoteData();
 
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
@@ -186,7 +194,7 @@ public class ClientsController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Clients");
+            Text overviewText = new Text(" / Quotes");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -256,40 +264,49 @@ public class ClientsController {
         alert.showAndWait();
     }
 
-    public void loadClientData() {
-        ObservableList<Client> clientList = FXCollections.observableArrayList();
+    public void loadQuoteData() {
+        ObservableList<Quote> quotes = FXCollections.observableArrayList();
 
-        String query = "SELECT client_id, client_name, client_email, client_discord, client_total_commission, client_total_revenue, client_since " +
-                "FROM client WHERE user_id = ?";
+        // Updated query to filter for quotes with status 'Accepted'
+        String query = "SELECT q.quote_id, q.quote_title, c.client_name, q.quote_price, q.quote_start_date, " +
+                "q.quote_deadline, q.quote_payment_terms, q.quote_status " +
+                "FROM quote q " +
+                "JOIN client c ON q.client_id = c.client_id " +
+                "WHERE q.user_id = ? AND q.quote_status = ?"; // Added condition for "Accepted" status
 
         try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            statement.setInt(1, userId); // Use the logged-in user's ID
-            ResultSet resultSet = statement.executeQuery();
+            preparedStatement.setInt(1, userId);  // Set the user ID parameter
+            preparedStatement.setString(2, "Accepted");  // Set the quote status to "Accepted"
+
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("client_id");
-                String name = resultSet.getString("client_name");
-                String email = resultSet.getString("client_email");
-                String discord = resultSet.getString("client_discord");
-                int totalCommission = resultSet.getInt("client_total_commission");
-                double totalRevenue = resultSet.getDouble("client_total_revenue");
-                String since = resultSet.getString("client_since");
+                int quoteId = resultSet.getInt("quote_id");
+                String title = resultSet.getString("quote_title");
+                String clientName = resultSet.getString("client_name");
+                double proposedPrice = resultSet.getDouble("quote_price");
+                String startDate = resultSet.getString("quote_start_date");
+                String deadline = resultSet.getString("quote_deadline");
+                String paymentTerms = resultSet.getString("quote_payment_terms");
+                String status = resultSet.getString("quote_status");
 
-                clientList.add(new Client(id, name, email, discord, totalCommission, totalRevenue, since));
+                // Add the Quote to the observable list
+                quotes.add(new Quote(quoteId, title, clientName, proposedPrice, startDate, deadline, paymentTerms, status));
             }
-
-            clientTable.setItems(clientList);
 
         } catch (SQLException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Database Error");
-            alert.setHeaderText("Failed to Load Clients");
-            alert.setContentText("An error occurred while loading client data.");
+            alert.setHeaderText("Failed to Load Quotes");
+            alert.setContentText("An error occurred while loading quotes: " + e.getMessage());
             alert.showAndWait();
         }
+
+        // Set the filtered list of quotes to the TableView
+        quoteTable.setItems(quotes);
     }
 
     @FXML
@@ -686,12 +703,13 @@ public class ClientsController {
             Parent idRoot = loader.load();
 
             IDGUIController idController = loader.getController();
-            idController.setCategoryName("Client"); // Set category name to "Product"
-            idController.setClientsController(this); // Pass reference for further actions
+            idController.setUserId(userId);
+            idController.setCategoryName("Quote");
+            idController.setAcceptedQuotesController(this); // Pass reference for further actions
 
             Stage stage = new Stage();
             stage.setScene(new Scene(idRoot));
-            stage.setTitle("Enter Client ID");
+            stage.setTitle("Enter Quote ID");
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
         } catch (IOException e) {
@@ -706,12 +724,12 @@ public class ClientsController {
 
     public void NewClicked(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewClient.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewQuote.fxml"));
             Parent adminRoot = loader.load();
 
-            NewClientController controller = loader.getController();
-            controller.setUserId(userId);
-            controller.setClientsController(this); // Pass the reference
+            NewQuoteController newQuoteController = loader.getController();
+            newQuoteController.setUserId(userId); // Set User ID
+            newQuoteController.setAcceptedQuotesController(this);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);
@@ -719,13 +737,12 @@ public class ClientsController {
             newStage.setResizable(false);
             newStage.initStyle(StageStyle.UNDECORATED);
             newStage.setScene(adminScene);
-            newStage.setTitle("New Client");
+            newStage.setTitle("New Quote");
             newStage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error loading NewClient.fxml: " + e.getMessage());
+            System.err.println("Error loading NewQuote.fxml: " + e.getMessage());
         }
     }
-
 
 }

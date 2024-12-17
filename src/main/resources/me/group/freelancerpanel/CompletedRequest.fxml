@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="1200.0" styleClass="backgroundColor" stylesheets="@allcolors.css" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.CompletedRequestController">
+   <children>
+      <ScrollPane layoutX="5.0" layoutY="163.0" prefHeight="520.0" prefWidth="299.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+         <content>
+            <VBox prefHeight="518.0" prefWidth="286.0" styleClass="backgroundColor">
+               <children>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="    Dashboard" wrappingWidth="99.0672914981842">
+                     <font>
+                        <Font name="Century Gothic" size="15.0" />
+                     </font>
+                  </Text>
+                  <AnchorPane onMouseClicked="#OverviewClicked" prefHeight="60.0" prefWidth="286.0">
+                     <children>
+                        <Text fill="WHITE" layoutX="74.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Overview">
+                           <font>
+                              <Font name="Century Gothic Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="31.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/dashboard.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <TreeView fx:id="CommissionTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane onMouseClicked="#InvoiceClicked" prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <Text fill="WHITE" layoutX="74.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Invoices">
+                           <font>
+                              <Font name="Century Gothic Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="34.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/invoice.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane onMouseClicked="#ClientsClicked" prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <Text fill="WHITE" layoutX="72.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Clients">
+                           <font>
+                              <Font name="Century Gothic Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="33.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/customer.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <TreeView fx:id="RequestTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <TreeView fx:id="QuotesTree" layoutY="7.0" prefHeight="45.0" prefWidth="230.0" styleClass="backgroundColor" stylesheets="@TransparentTreeView.css" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane onMouseClicked="#ProductClicked" prefHeight="60.0" prefWidth="218.0">
+                     <children>
+                        <Text fill="WHITE" layoutX="72.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Products">
+                           <font>
+                              <Font name="Century Gothic Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <ImageView fitHeight="31.0" fitWidth="28.0" layoutX="33.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/product.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+      <ScrollPane layoutX="316.0" prefHeight="758.0" prefWidth="885.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+         <content>
+            <Pane prefHeight="766.0" prefWidth="869.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+               <children>
+                  <AnchorPane layoutX="33.0" layoutY="61.0" prefHeight="51.0" prefWidth="816.0" style="-fx-background-radius: 15; -fx-background-color: #282828;" styleClass="backgroundColor" stylesheets="@blue.css">
+                     <children>
+                        <AnchorPane layoutX="702.0" layoutY="10.0" onMouseClicked="#NewClicked" prefHeight="32.0" prefWidth="100.0" style="-fx-background-color: WHITE; -fx-background-radius: 10;">
+                           <children>
+                              <Text layoutX="24.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="+ New">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </AnchorPane>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="14.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/sorting.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="60.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/filter.png" />
+                           </image>
+                        </ImageView>
+                        <TextField layoutX="101.0" layoutY="13.0" prefHeight="26.0" prefWidth="202.0" promptText="Search rows" style="-fx-background-color: transparent;" />
+                        <AnchorPane layoutX="592.0" layoutY="10.0" onMouseClicked="#EditClicked" prefHeight="32.0" prefWidth="100.0" style="-fx-background-color: WHITE; -fx-background-radius: 10;">
+                           <children>
+                              <Text layoutX="35.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edit">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+                  <ScrollPane layoutX="33.0" layoutY="156.0" prefHeight="539.0" prefWidth="810.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1000.0">
+                           <children>
+                              <TableView fx:id="requestTable" layoutY="-1.0" prefHeight="520.0" prefWidth="1000.0" stylesheets="@tableview.css">
+                                <columns>
+                                  <TableColumn fx:id="RequestID" text="# ID" />
+                                  <TableColumn fx:id="RequestDescription" prefWidth="190.0" text="Description" />
+                                    <TableColumn fx:id="RequestCommission" prefWidth="120.0" text="Commission" />
+                                    <TableColumn fx:id="RequestOfferedAmount" prefWidth="120.0" text="Offered Amount" />
+                                    <TableColumn fx:id="RequestPaid" prefWidth="120.0" text="Paid" />
+                                    <TableColumn fx:id="RequestDeadline" prefWidth="120.0" text="Deadline" />
+                                    <TableColumn fx:id="RequestSubmittedat" prefWidth="120.0" text="Submitted at" />
+                                    <TableColumn fx:id="RequestStatus" prefWidth="120.0" text="Status" />
+                                </columns>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+                  <TextFlow fx:id="User_name2" layoutX="14.0" layoutY="14.0" prefHeight="32.0" prefWidth="200.0" />
+               </children>
+            </Pane>
+         </content>
+      </ScrollPane>
+      <AnchorPane layoutX="37.0" layoutY="23.0" prefHeight="102.0" prefWidth="236.0" style="-fx-background-color: #282828; -fx-background-radius: 12;">
+         <children>
+            <Text fill="#aeaeae" layoutX="31.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Commission Value">
+               <font>
+                  <Font name="Century Gothic Bold" size="14.0" />
+               </font>
+            </Text>
+            <Text fx:id="ActiveCommissionValue" fill="WHITE" layoutX="31.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="₱ 500">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Text>
+            <Text fx:id="NumberCommissions" fill="#aeaeae" layoutX="31.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number Commissions">
+               <font>
+                  <Font name="Century Gothic Bold" size="12.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="6.0" layoutY="689.0" prefHeight="69.0" prefWidth="299.0">
+         <children>
+            <ImageView fitHeight="43.0" fitWidth="43.0" layoutX="38.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/user.png" />
+               </image>
+            </ImageView>
+            <Text fx:id="User_name" fill="WHITE" layoutX="93.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name Placeholder" wrappingWidth="187.30238342285156">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+            <Text fx:id="User_email" fill="#a6a6a6" layoutX="93.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="email@gmail.com" wrappingWidth="173.865234375">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+   </children>
+</Pane>
