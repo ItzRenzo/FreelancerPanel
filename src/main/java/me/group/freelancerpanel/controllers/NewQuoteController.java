@@ -178,6 +178,14 @@ public class NewQuoteController {
                     allquotesController.loadQuoteData();
                 }
 
+                if (pendingquotesController != null) {
+                    pendingquotesController.loadQuoteData();
+                }
+
+                if (acceptedquotesController != null) {
+                    acceptedquotesController.loadQuoteData();
+                }
+
                 // Close the window after success
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.close();

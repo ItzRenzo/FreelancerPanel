@@ -41,7 +41,9 @@ public class EditQuoteController {
 
     private int quoteId; // The ID of the quote being edited
     private int userId; // The ID of the logged-in user
-    private AllQuotesController allQuotesController; // Reference to the parent controller
+    private AllQuotesController allquotesController; // Reference to the parent controller
+    private PendingQuotesController pendingquotesController; // Reference to the parent controller
+    private AcceptedQuotesController acceptedquotesController; // Reference to the parent controller
 
     public void setQuoteId(int quoteId) {
         this.quoteId = quoteId;
@@ -53,8 +55,16 @@ public class EditQuoteController {
         loadClientsIntoComboBox(); // Populate clients based on user ID
     }
 
-    public void setAllQuotesController(AllQuotesController allQuotesController) {
-        this.allQuotesController = allQuotesController;
+    public void setAllQuotesController(AllQuotesController allquotesController) {
+        this.allquotesController = allquotesController;
+    }
+
+    public void setPendingQuotesController(PendingQuotesController pendingquotesController) {
+        this.pendingquotesController = pendingquotesController;
+    }
+
+    public void setAcceptedQuotesController(AcceptedQuotesController acceptedquotesController) {
+        this.acceptedquotesController = acceptedquotesController;
     }
 
     @FXML
@@ -203,8 +213,16 @@ public class EditQuoteController {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Quote Updated",
                         "The quote has been successfully updated.");
 
-                if (allQuotesController != null) {
-                    allQuotesController.loadQuoteData();
+                if (allquotesController != null) {
+                    allquotesController.loadQuoteData();
+                }
+
+                if (pendingquotesController != null) {
+                    pendingquotesController.loadQuoteData();
+                }
+
+                if (acceptedquotesController != null) {
+                    acceptedquotesController.loadQuoteData();
                 }
 
                 closeWindow(event);

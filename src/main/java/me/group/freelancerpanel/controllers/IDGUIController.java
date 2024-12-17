@@ -167,6 +167,8 @@ public class IDGUIController {
                 editController.setRequestId(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setAllRequestController(allrequestController);
+                editController.setPendingRequestController(pendingrequestController);
+                editController.setCompletedRequestController(completedrequestController);
             } else if (allquotesController != null || pendingquotesController != null || acceptedquotesController != null) {
                 loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditQuote.fxml"));
                 editRoot = loader.load();
@@ -175,6 +177,8 @@ public class IDGUIController {
                 editController.setQuoteId(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setAllQuotesController(allquotesController);
+                editController.setPendingQuotesController(pendingquotesController);
+                editController.setAcceptedQuotesController(acceptedquotesController);
             } else {
                 throw new IllegalStateException("No controller reference set!");
             }

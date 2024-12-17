@@ -148,6 +148,14 @@ public class NewRequestController {
                     allrequestController.loadRequestData();
                 }
 
+                if (pendingrequestController != null) {
+                    pendingrequestController.loadRequestData();
+                }
+
+                if (completedrequestController != null) {
+                    completedrequestController.loadRequestData();
+                }
+
                 // Close the window after success
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.close();

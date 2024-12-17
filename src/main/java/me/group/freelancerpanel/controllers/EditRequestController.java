@@ -32,12 +32,23 @@ public class EditRequestController {
     @FXML
     private ComboBox<String> StatusComboBox;
 
-    private AllRequestController allrequestController; // Reference to parent controller
     private int userId; // Store the current logged-in user's ID
     private int requestId; // Store the ID of the request being edited
 
+    private AllRequestController allrequestController;
+    private PendingRequestController pendingrequestController;
+    private CompletedRequestController completedrequestController;
+
     public void setAllRequestController(AllRequestController allrequestController) {
         this.allrequestController = allrequestController;
+    }
+
+    public void setPendingRequestController(PendingRequestController pendingrequestController) {
+        this.pendingrequestController = pendingrequestController;
+    }
+
+    public void setCompletedRequestController(CompletedRequestController completedrequestController) {
+        this.completedrequestController = completedrequestController;
     }
 
     public void setUserId(int userId) {
@@ -200,6 +211,14 @@ public class EditRequestController {
 
                 if (allrequestController != null) {
                     allrequestController.loadRequestData();
+                }
+
+                if (pendingrequestController != null) {
+                    pendingrequestController.loadRequestData();
+                }
+
+                if (completedrequestController != null) {
+                    completedrequestController.loadRequestData();
                 }
 
                 // Close the window after success
