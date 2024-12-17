@@ -171,6 +171,12 @@ public class NewCommissionController {
             return;
         }
 
+        // Validate that the total paid is not greater than the total value
+        if (paid.compareTo(total) > 0) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Input", "Paid amount exceeds Total Value", "The total paid cannot be greater than the total value.");
+            return;
+        }
+
         // Get the product_id based on the selected product name
         int productId = getProductId(selectedProduct);
 
@@ -213,6 +219,7 @@ public class NewCommissionController {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Create Commission", "An error occurred while connecting to the database: " + e.getMessage());
         }
     }
+
 
     private void showAlert(Alert.AlertType type, String title, String header, String content) {
         Alert alert = new Alert(type);

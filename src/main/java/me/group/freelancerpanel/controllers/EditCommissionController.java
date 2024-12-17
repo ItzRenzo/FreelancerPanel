@@ -6,10 +6,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.sql.*;
 
 public class EditCommissionController {
 
@@ -307,25 +305,48 @@ public class EditCommissionController {
             return;
         }
 
+        BigDecimal total;
+        BigDecimal paid;
+        try {
+            total = new BigDecimal(totalValue);
+            paid = new BigDecimal(totalPaid);
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Input", "Total/Paid fields should be numbers", "Please enter valid numbers for total and paid amounts.");
+            return;
+        }
+
+        // Validate that the total paid is not greater than the total value
+        if (paid.compareTo(total) > 0) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Input", "Paid amount exceeds Total Value", "The total paid cannot be greater than the total value.");
+            return;
+        }
+
         // Get product_id from product name (ensure the product name is valid and exists in the combo box)
         int productId = getProductId(selectedProduct);
 
-        String updateQuery = "UPDATE commission " +
-                "SET commission_title = ?, client_id = ?, commission_total_value = ?, commission_total_paid = ?, commission_start_date = ?, commission_deadline = ?, commission_status = ?, product_id = ? " +
-                "WHERE commission_id = ?";
+        if (productId == -1) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Invalid Product", "The selected product is invalid. Please try again.");
+            return;
+        }
+
+        String updateQuery = """
+            UPDATE commission
+            SET commission_title = ?, client_id = ?, commission_total_value = ?, commission_total_paid = ?, commission_start_date = ?, commission_deadline = ?, commission_status = ?, product_id = ?
+            WHERE commission_id = ?
+            """;
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
             preparedStatement.setString(1, title);
-            preparedStatement.setInt(2, client.getId());  // Pass client ID
-            preparedStatement.setDouble(3, Double.parseDouble(totalValue));
-            preparedStatement.setDouble(4, Double.parseDouble(totalPaid));
-            preparedStatement.setString(5, startDate);
-            preparedStatement.setString(6, deadline);
+            preparedStatement.setInt(2, client.getId()); // Pass client ID
+            preparedStatement.setBigDecimal(3, total);
+            preparedStatement.setBigDecimal(4, paid);
+            preparedStatement.setDate(5, Date.valueOf(startDate));
+            preparedStatement.setDate(6, Date.valueOf(deadline));
             preparedStatement.setString(7, status);
-            preparedStatement.setInt(8, productId);  // Set the product_id
-            preparedStatement.setInt(9, commissionID);  // The commission ID for updating the correct record
+            preparedStatement.setInt(8, productId); // Set the product_id
+            preparedStatement.setInt(9, commissionID); // The commission ID for updating the correct record
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 1) {
@@ -343,23 +364,22 @@ public class EditCommissionController {
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.close();
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Update Failed");
-                alert.setContentText("No rows were updated. Please try again.");
-                alert.showAndWait();
+                showAlert(Alert.AlertType.ERROR, "Error", "Update Failed", "No rows were updated. Please try again.");
             }
 
-        } catch (SQLException | NumberFormatException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
-            alert.setHeaderText("Failed to Update Commission");
-            alert.setContentText("An error occurred while updating the commission: " + e.getMessage());
-            alert.showAndWait();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Update Commission", "An error occurred while updating the commission: " + e.getMessage());
         }
     }
 
+    private void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 
     private void closeWindow(MouseEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
