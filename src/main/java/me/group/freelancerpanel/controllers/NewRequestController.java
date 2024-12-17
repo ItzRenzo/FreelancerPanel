@@ -56,7 +56,7 @@ public class NewRequestController {
 
     // Populate status ComboBox with predefined values
     private void initializeStatusComboBox() {
-        StatusComboBox.getItems().addAll("Rejected", "Pending", "Accepted", "Cancelled");
+        StatusComboBox.getItems().addAll("Not started", "In Progress", "Paused", "Rejected", "Completed", "Cancelled");
     }
 
     // Populate the CommissionComboBox
