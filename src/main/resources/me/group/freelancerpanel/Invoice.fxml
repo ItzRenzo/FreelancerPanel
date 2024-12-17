@@ -100,36 +100,13 @@
             </VBox>
          </content>
       </ScrollPane>
-      <ScrollPane layoutX="962.0" layoutY="-14.0" prefHeight="758.0" prefWidth="224.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+      <ScrollPane layoutX="316.0" prefHeight="758.0" prefWidth="885.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
          <content>
-            <Pane prefHeight="723.0" prefWidth="218.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+            <Pane prefHeight="766.0" prefWidth="869.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
                <children>
-                  <Text fill="WHITE" layoutX="16.0" layoutY="59.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Commission Due">
-                     <font>
-                        <Font name="Century Gothic Bold" size="15.0" />
-                     </font>
-                  </Text>
-                  <Text fill="WHITE" layoutX="16.0" layoutY="324.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Open Change Request">
-                     <font>
-                        <Font name="Century Gothic Bold" size="15.0" />
-                     </font>
-                  </Text>
-                  <Text fill="WHITE" layoutX="14.0" layoutY="548.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Your Clients">
-                     <font>
-                        <Font name="Century Gothic Bold" size="15.0" />
-                     </font>
-                  </Text>
-               </children>
-            </Pane>
-         </content>
-      </ScrollPane>
-      <ScrollPane layoutX="316.0" prefHeight="758.0" prefWidth="632.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
-         <content>
-            <Pane prefHeight="766.0" prefWidth="614.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
-               <children>
-                  <AnchorPane layoutX="33.0" layoutY="61.0" prefHeight="51.0" prefWidth="548.0" style="-fx-background-radius: 15; -fx-background-color: #282828;" styleClass="backgroundColor" stylesheets="@blue.css">
+                  <AnchorPane layoutX="33.0" layoutY="61.0" prefHeight="51.0" prefWidth="816.0" style="-fx-background-radius: 15; -fx-background-color: #282828;" styleClass="backgroundColor" stylesheets="@blue.css">
                      <children>
-                        <AnchorPane layoutX="433.0" layoutY="10.0" onMouseClicked="#NewClicked" prefHeight="32.0" prefWidth="100.0" style="-fx-background-color: WHITE; -fx-background-radius: 10;">
+                        <AnchorPane layoutX="702.0" layoutY="10.0" onMouseClicked="#NewClicked" prefHeight="32.0" prefWidth="100.0" style="-fx-background-color: WHITE; -fx-background-radius: 10;">
                            <children>
                               <Text layoutX="24.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="+ New">
                                  <font>
@@ -149,7 +126,7 @@
                            </image>
                         </ImageView>
                         <TextField layoutX="101.0" layoutY="13.0" prefHeight="26.0" prefWidth="202.0" promptText="Search rows" style="-fx-background-color: transparent;" />
-                        <AnchorPane layoutX="324.0" layoutY="10.0" onMouseClicked="#EditClicked" prefHeight="32.0" prefWidth="100.0" style="-fx-background-color: WHITE; -fx-background-radius: 10;">
+                        <AnchorPane layoutX="592.0" layoutY="10.0" onMouseClicked="#EditClicked" prefHeight="32.0" prefWidth="100.0" style="-fx-background-color: WHITE; -fx-background-radius: 10;">
                            <children>
                               <Text layoutX="35.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edit">
                                  <font>
@@ -160,7 +137,7 @@
                         </AnchorPane>
                      </children>
                   </AnchorPane>
-                  <ScrollPane layoutX="33.0" layoutY="156.0" prefHeight="539.0" prefWidth="548.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
+                  <ScrollPane layoutX="33.0" layoutY="156.0" prefHeight="539.0" prefWidth="810.0" styleClass="backgroundColor" stylesheets="@ScrollPaneColor.css">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="524.0" prefWidth="1160.0">
                            <children>
@@ -199,7 +176,7 @@
                   <Font size="24.0" />
                </font>
             </Text>
-            <Text fill="#aeaeae" layoutX="31.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number Commissions">
+            <Text fx:id="NumberCommissions" fill="#aeaeae" layoutX="31.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number Commissions">
                <font>
                   <Font name="Century Gothic Bold" size="12.0" />
                </font>

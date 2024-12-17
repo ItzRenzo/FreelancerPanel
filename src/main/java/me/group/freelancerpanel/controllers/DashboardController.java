@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -40,6 +41,9 @@ public class DashboardController {
 
     @FXML
     private Text OpenChangeRequest;
+
+    @FXML
+    private Text NumberCommissions;
 
     @FXML
     private BarChart<String, Number> RevenueByProduct;
@@ -156,6 +160,60 @@ public class DashboardController {
         loadRevenueByProduct();
         loadMonthlyRevenue();
         loadPopularProductsPieChart();
+        loadNumberCommissions();
+    }
+
+    private void loadActiveCommissionValue() {
+        String query = """
+        SELECT SUM(commission_total_value) AS active_value
+        FROM commission
+        WHERE user_id = ? AND commission_status != 'Completed';
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                ActiveCommissionValue.setText("₱ " + resultSet.getDouble("active_value"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadNumberCommissions() {
+        String query = """
+            SELECT COUNT(*) AS open_commissions
+            FROM commission
+            WHERE user_id = ?
+            AND commission_status IN ('Not Started', 'In Progress', 'Paused');
+            """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int openCommissions = resultSet.getInt("open_commissions");
+                NumberCommissions.setText(openCommissions + " Commissions");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Commissions", e.getMessage());
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void loadPopularProductsPieChart() {
@@ -205,26 +263,6 @@ public class DashboardController {
 
             if (resultSet.next()) {
                 TotalCompletedCommissions.setText(String.valueOf(resultSet.getInt("total_completed")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadActiveCommissionValue() {
-        String query = """
-        SELECT SUM(commission_total_value) AS active_value
-        FROM commission
-        WHERE user_id = ? AND commission_status != 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                ActiveCommissionValue.setText("₱ " + resultSet.getDouble("active_value"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -347,7 +385,6 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void initializeCommissionTree() {

@@ -59,6 +59,12 @@ public class AllQuotesController {
     private TreeView<String> QuotesTree;
 
     @FXML
+    private Text ActiveCommissionValue;
+
+    @FXML
+    private Text NumberCommissions;
+
+    @FXML
     private Text User_name;
 
     @FXML
@@ -76,6 +82,7 @@ public class AllQuotesController {
         this.userId = userId;
         System.out.println("AllQuotesController: User ID set to " + userId);
         loadQuoteData();
+        loadDashboardData();
     }
 
     // Setter for username
@@ -167,6 +174,64 @@ public class AllQuotesController {
         if (email != null) {
             User_email.setText(email);
         }
+    }
+
+    private void loadDashboardData() {
+        loadActiveCommissionValue();
+        loadNumberCommissions();
+    }
+
+    private void loadActiveCommissionValue() {
+        String query = """
+        SELECT SUM(commission_total_value) AS active_value
+        FROM commission
+        WHERE user_id = ? AND commission_status != 'Completed';
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                ActiveCommissionValue.setText("₱ " + resultSet.getDouble("active_value"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadNumberCommissions() {
+        String query = """
+            SELECT COUNT(*) AS open_commissions
+            FROM commission
+            WHERE user_id = ?
+            AND commission_status IN ('Not Started', 'In Progress', 'Paused');
+            """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int openCommissions = resultSet.getInt("open_commissions");
+                NumberCommissions.setText(openCommissions + " Commissions");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Commissions", e.getMessage());
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     public void loadQuoteData() {
