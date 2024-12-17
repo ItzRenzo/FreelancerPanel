@@ -217,14 +217,17 @@ public class NewCommissionController {
 
                 if (allcommissionsController != null) {
                     allcommissionsController.loadCommissionData();
+                    allcommissionsController.loadActiveCommissionValue();
                 }
 
                 if (activecommissionsController != null) {
-                    activecommissionsController.loadCommissionData();
+                    activecommissionsController.loadCommissionData(); // Refresh data in the parent table
+                    activecommissionsController.loadActiveCommissionValue();
                 }
 
                 if (unstartedcommissionsController != null) {
-                    unstartedcommissionsController.loadCommissionData();
+                    unstartedcommissionsController.loadCommissionData(); // Refresh data in the parent table
+                    unstartedcommissionsController.loadActiveCommissionValue();
                 }
 
                 closeWindow(event);

@@ -213,7 +213,7 @@ public class ActiveCommissionsController {
         loadNumberCommissions();
     }
 
-    private void loadActiveCommissionValue() {
+    public void loadActiveCommissionValue() {
         String query = """
         SELECT SUM(commission_total_value) AS active_value
         FROM commission

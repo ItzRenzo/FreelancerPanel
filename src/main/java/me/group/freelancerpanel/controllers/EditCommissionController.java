@@ -368,14 +368,17 @@ public class EditCommissionController {
 
                 if (allcommissionController != null) {
                     allcommissionController.loadCommissionData(); // Refresh data in the parent table
+                    allcommissionController.loadActiveCommissionValue();
                 }
 
                 if (activecommissionsController != null) {
-                    activecommissionsController.loadCommissionData();
+                    activecommissionsController.loadCommissionData(); // Refresh data in the parent table
+                    activecommissionsController.loadActiveCommissionValue();
                 }
 
                 if (unstartedcommissionsController != null) {
-                    unstartedcommissionsController.loadCommissionData();
+                    unstartedcommissionsController.loadCommissionData(); // Refresh data in the parent table
+                    unstartedcommissionsController.loadActiveCommissionValue();
                 }
 
                 // Close the editing window
