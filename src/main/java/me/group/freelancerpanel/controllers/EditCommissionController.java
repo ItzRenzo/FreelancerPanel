@@ -40,6 +40,8 @@ public class EditCommissionController {
 
     private int commissionID;
     private AllCommissionsController allcommissionController; // Reference to parent controller
+    private ActiveCommissionsController activecommissionsController; // Reference to parent controller
+    private UnstartedCommissionsController unstartedcommissionsController; // Reference to parent controller
 
     private int userId;
 
@@ -56,6 +58,14 @@ public class EditCommissionController {
 
     public void setCommissionController(AllCommissionsController allcommissionController) {
         this.allcommissionController = allcommissionController;
+    }
+
+    public void setActiveCommissionsController(ActiveCommissionsController activecommissionsController) {
+        this.activecommissionsController = activecommissionsController;
+    }
+
+    public void setUnstartedCommissionsController(UnstartedCommissionsController unstartedcommissionsController) {
+        this.unstartedcommissionsController = unstartedcommissionsController;
     }
 
     // Helper method to load client details by client_id
@@ -358,6 +368,14 @@ public class EditCommissionController {
 
                 if (allcommissionController != null) {
                     allcommissionController.loadCommissionData(); // Refresh data in the parent table
+                }
+
+                if (activecommissionsController != null) {
+                    activecommissionsController.loadCommissionData();
+                }
+
+                if (unstartedcommissionsController != null) {
+                    unstartedcommissionsController.loadCommissionData();
                 }
 
                 // Close the editing window

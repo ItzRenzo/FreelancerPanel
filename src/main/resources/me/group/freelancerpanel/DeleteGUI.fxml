@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="370.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.DeleteGUIController">
+   <children>
+      <AnchorPane prefHeight="63.0" prefWidth="370.0" style="-fx-background-color: #282828;">
+         <children>
+            <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="321.0" layoutY="14.0" onMouseClicked="#CloseClicked" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/exit.png" />
+               </image>
+            </ImageView>
+            <TextFlow fx:id="IDText" layoutX="14.0" layoutY="14.0" prefHeight="35.0" prefWidth="200.0" />
+         </children>
+      </AnchorPane>
+      <TextField fx:id="IDInputField" layoutX="16.0" layoutY="109.0" prefHeight="25.0" prefWidth="334.0" stylesheets="@allcolors.css" />
+      <AnchorPane layoutX="140.0" layoutY="147.0" onMouseClicked="#DeleteClicked" prefHeight="35.0" prefWidth="90.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 10;">
+         <children>
+            <Text layoutX="20.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Delete">
+               <font>
+                  <Font name="Calibri Bold" size="18.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <TextFlow fx:id="EnterIDText" layoutX="16.0" layoutY="74.0" prefHeight="35.0" prefWidth="200.0" />
+   </children>
+</Pane>

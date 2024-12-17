@@ -149,6 +149,8 @@ public class IDGUIController {
                 editController.setCommissionID(Integer.parseInt(enteredID));
                 editController.setUserId(userId);
                 editController.setCommissionController(allcommissionController);
+                editController.setActiveCommissionsController(activecommissionsController);
+                editController.setUnstartedCommissionsController(unstartedcommissionsController);
             } else if (invoiceController != null) {
                 loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditInvoice.fxml"));
                 editRoot = loader.load();

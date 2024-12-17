@@ -711,6 +711,25 @@ public class ActiveCommissionsController {
         }
     }
 
+    public void DeleteClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/DeleteGUI.fxml"));
+            Parent root = loader.load();
+
+            DeleteGUIController idController = loader.getController();
+            idController.setTableName("commission"); // Set the table name dynamically
+            idController.setReloadTableMethod(this::loadCommissionData); // Pass the reload method
+
+            Stage stage = new Stage();
+            stage.setTitle("Delete Commission");
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void EditClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/ID_GUI.fxml"));

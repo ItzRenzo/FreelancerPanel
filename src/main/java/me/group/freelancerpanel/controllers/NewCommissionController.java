@@ -219,6 +219,14 @@ public class NewCommissionController {
                     allcommissionsController.loadCommissionData();
                 }
 
+                if (activecommissionsController != null) {
+                    activecommissionsController.loadCommissionData();
+                }
+
+                if (unstartedcommissionsController != null) {
+                    unstartedcommissionsController.loadCommissionData();
+                }
+
                 closeWindow(event);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to Create Commission", "An error occurred while adding the commission. Please try again.");
