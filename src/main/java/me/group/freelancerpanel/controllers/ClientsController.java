@@ -704,6 +704,26 @@ public class ClientsController {
         }
     }
 
+    public void DeleteClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/DeleteGUI.fxml"));
+            Parent root = loader.load();
+
+            DeleteGUIController idController = loader.getController();
+            idController.setTableName("client"); // Set the table name dynamically
+            idController.setReloadTableMethod(this::loadClientData); // Pass the reload method
+
+            Stage stage = new Stage();
+            stage.setTitle("Delete Client");
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void NewClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/NewClient.fxml"));

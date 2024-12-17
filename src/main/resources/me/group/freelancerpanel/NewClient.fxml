@@ -29,9 +29,9 @@
             <Font name="Calibri Bold" size="18.0" />
          </font>
       </Text>
-      <TextField fx:id="NameTF" layoutX="16.0" layoutY="109.0" prefHeight="25.0" prefWidth="567.0" style="-fx-background-color: #282828;" />
-      <TextField fx:id="DiscordTF" layoutX="17.0" layoutY="188.0" prefHeight="25.0" prefWidth="567.0" style="-fx-background-color: #282828;" />
-      <TextField fx:id="EmailTF" layoutX="17.0" layoutY="262.0" prefHeight="25.0" prefWidth="567.0" style="-fx-background-color: #282828;" />
+      <TextField fx:id="NameTF" layoutX="16.0" layoutY="109.0" prefHeight="25.0" prefWidth="567.0" style="-fx-background-color: #282828;" stylesheets="@allcolors.css" />
+      <TextField fx:id="DiscordTF" layoutX="17.0" layoutY="188.0" prefHeight="25.0" prefWidth="567.0" style="-fx-background-color: #282828;" stylesheets="@allcolors.css" />
+      <TextField fx:id="EmailTF" layoutX="17.0" layoutY="262.0" prefHeight="25.0" prefWidth="567.0" style="-fx-background-color: #282828;" stylesheets="@allcolors.css" />
       <Text fill="WHITE" layoutX="14.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Discord Username:">
          <font>
             <Font name="Calibri Bold" size="18.0" />
