@@ -274,19 +274,20 @@ public class ActiveCommissionsController {
             // Get a database connection
             Connection connection = DatabaseHandler.getConnection();
 
-            // SQL query to filter commissions with status "In Progress" or "Paused"
+            // SQL query to filter commissions with status "In Progress" or "Paused" and user_id
             String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
                     "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
                     "p.product_name, c.commission_status " +
                     "FROM commission c " +
                     "LEFT JOIN client cl ON c.client_id = cl.client_id " +
                     "LEFT JOIN product p ON c.product_id = p.product_id " +
-                    "WHERE c.commission_status = ? OR c.commission_status = ?";
+                    "WHERE (c.commission_status = ? OR c.commission_status = ?) AND c.user_id = ?";
 
             // Use PreparedStatement for query execution with parameters
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, "In Progress"); // First parameter: "In Progress"
             preparedStatement.setString(2, "Paused");      // Second parameter: "Paused"
+            preparedStatement.setInt(3, userId);           // Third parameter: user_id to filter by user
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -319,6 +320,7 @@ public class ActiveCommissionsController {
         // Set the filtered data to the TableView
         commissionTable.setItems(commissions);
     }
+
 
 
     @FXML

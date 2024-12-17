@@ -274,18 +274,19 @@ public class UnstartedCommissionsController {
             // Assuming a database connection is established
             Connection connection = DatabaseHandler.getConnection();
 
-            // SQL query to filter commissions with status "Not Started"
+            // SQL query to filter commissions with status "Not Started" and user_id
             String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
                     "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
                     "p.product_name, c.commission_status " +
                     "FROM commission c " +
                     "LEFT JOIN client cl ON c.client_id = cl.client_id " +
                     "LEFT JOIN product p ON c.product_id = p.product_id " +
-                    "WHERE c.commission_status = ?"; // Filter for "Not Started" commissions
+                    "WHERE c.commission_status = ? AND c.user_id = ?"; // Added user_id filter
 
             // Use PreparedStatement for parameterized query
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, "Not Started"); // Parameter: "Not Started"
+            preparedStatement.setInt(2, userId);           // Parameter: user_id to filter by user
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -315,9 +316,10 @@ public class UnstartedCommissionsController {
                     "An error occurred while loading commissions with 'Not Started' status: " + e.getMessage());
         }
 
-        // Set the data to the TableView
+        // Set the filtered data to the TableView
         commissionTable.setItems(commissions);
     }
+
 
     @FXML
     private void initializeCommissionTree() {

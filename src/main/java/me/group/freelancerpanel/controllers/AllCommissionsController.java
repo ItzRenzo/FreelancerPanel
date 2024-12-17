@@ -273,15 +273,20 @@ public class AllCommissionsController {
         try {
             // Assuming a database connection is established
             Connection connection = DatabaseHandler.getConnection();
-            // SQL query to join the commission, client, and product tables
+
+            // SQL query with user_id filter
             String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
                     "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
                     "p.product_name, c.commission_status " +
                     "FROM commission c " +
                     "LEFT JOIN client cl ON c.client_id = cl.client_id " +
-                    "LEFT JOIN product p ON c.product_id = p.product_id";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+                    "LEFT JOIN product p ON c.product_id = p.product_id " +
+                    "WHERE c.user_id = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId); // Set the user_id parameter
+
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 // Populate the Commission object with the data
@@ -298,15 +303,21 @@ public class AllCommissionsController {
                 ));
             }
 
-            // Close the connection
+            // Close the connection and resources
+            resultSet.close();
+            preparedStatement.close();
             connection.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Commissions",
+                    "An error occurred while loading commissions: " + e.getMessage());
         }
 
-        // Set the data to the TableView
+        // Set the filtered data to the TableView
         commissionTable.setItems(commissions);
     }
+
 
     @FXML
     private void initializeCommissionTree() {
@@ -694,6 +705,10 @@ public class AllCommissionsController {
             e.printStackTrace();
             System.err.println("Error loading Product.fxml: " + e.getMessage());
         }
+    }
+
+    public void DeleteClicked(MouseEvent event) {
+
     }
 
     public void EditClicked(MouseEvent event) {
