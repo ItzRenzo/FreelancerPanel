@@ -119,6 +119,16 @@ public class ProductController {
                 loadAllCommissionsView();
             }
         });
+        CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("Active commissions")) {
+                loadActiveCommissionsView();
+            }
+        });
+        CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.getValue().equals("Unstarted commissions")) {
+                loadUnstartedCommissionsView();
+            }
+        });
         RequestTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All requests")) {
                 loadAllRequestView();
@@ -369,6 +379,48 @@ public class ProductController {
             allcommissionController.setUserId(userId);
             allcommissionController.setUsername(username);
             allcommissionController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadActiveCommissionsView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/ActiveCommissions.fxml"));
+            Parent adminRoot = loader.load();
+
+            ActiveCommissionsController activecommissionsController = loader.getController();
+            activecommissionsController.setUserId(userId);
+            activecommissionsController.setUsername(username);
+            activecommissionsController.setUserEmail(email);
+
+            // Get the current stage and set the scene only once
+            Stage stage = (Stage) CommissionTree.getScene().getWindow();
+            Scene adminScene = new Scene(adminRoot);
+            stage.setScene(adminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadUnstartedCommissionsView() {
+        try {
+            // Load the new FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/UnstartedCommissions.fxml"));
+            Parent adminRoot = loader.load();
+
+            UnstartedCommissionsController unstartedcommissionsController = loader.getController();
+            unstartedcommissionsController.setUserId(userId);
+            unstartedcommissionsController.setUsername(username);
+            unstartedcommissionsController.setUserEmail(email);
 
             // Get the current stage and set the scene only once
             Stage stage = (Stage) CommissionTree.getScene().getWindow();

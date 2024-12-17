@@ -30,6 +30,8 @@ public class IDGUIController {
     private ProductController productsController; // Reference for ProductController
     private ClientsController clientsController; // Reference for ClientsController
     private AllCommissionsController allcommissionController; // Reference for AllCommissionsController
+    private ActiveCommissionsController activecommissionsController; // Reference for AllCommissionsController
+    private UnstartedCommissionsController unstartedcommissionsController; // Reference for AllCommissionsController
     private InvoiceController invoiceController; // Reference for InvoiceController
     private AllRequestController allrequestController; // Reference for AllRequestController
     private AllQuotesController allquotesController; // Reference for AllQuoteController
@@ -69,6 +71,14 @@ public class IDGUIController {
 
     public void setAllCommissionsController(AllCommissionsController allcommissionController) {
         this.allcommissionController = allcommissionController;
+    }
+
+    public void setActiveCommissionsController(ActiveCommissionsController activecommissionsController) {
+        this.activecommissionsController = activecommissionsController;
+    }
+
+    public void setUnstartedCommissionsController(UnstartedCommissionsController unstartedcommissionsController) {
+        this.unstartedcommissionsController = unstartedcommissionsController;
     }
 
     public void setInvoiceController(InvoiceController invoiceController) {
@@ -111,7 +121,7 @@ public class IDGUIController {
                 EditClientController editController = loader.getController();
                 editController.setClientID(Integer.parseInt(enteredID));
                 editController.setClientsController(clientsController);
-            } else if (allcommissionController != null) {
+            } else if (allcommissionController != null || activecommissionsController != null || unstartedcommissionsController != null) {
                 loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/EditCommission.fxml"));
                 editRoot = loader.load();
 

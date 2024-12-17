@@ -19,7 +19,7 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.sql.*;
 
-public class AllCommissionsController {
+public class UnstartedCommissionsController {
 
     @FXML
     private TableView<Commission> commissionTable;
@@ -253,15 +253,21 @@ public class AllCommissionsController {
         try {
             // Assuming a database connection is established
             Connection connection = DatabaseHandler.getConnection();
-            // SQL query to join the commission, client, and product tables
+
+            // SQL query to filter commissions with status "Not Started"
             String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
                     "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
                     "p.product_name, c.commission_status " +
                     "FROM commission c " +
                     "LEFT JOIN client cl ON c.client_id = cl.client_id " +
-                    "LEFT JOIN product p ON c.product_id = p.product_id";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+                    "LEFT JOIN product p ON c.product_id = p.product_id " +
+                    "WHERE c.commission_status = ?"; // Filter for "Not Started" commissions
+
+            // Use PreparedStatement for parameterized query
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, "Not Started"); // Parameter: "Not Started"
+
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 // Populate the Commission object with the data
@@ -278,10 +284,15 @@ public class AllCommissionsController {
                 ));
             }
 
-            // Close the connection
+            // Close the connection and prepared statement
+            resultSet.close();
+            preparedStatement.close();
             connection.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Commissions",
+                    "An error occurred while loading commissions with 'Not Started' status: " + e.getMessage());
         }
 
         // Set the data to the TableView
@@ -600,7 +611,7 @@ public class AllCommissionsController {
             IDGUIController idController = loader.getController();
             idController.setUserId(userId);
             idController.setCategoryName("Commission"); // Set category name to "Product"
-            idController.setAllCommissionsController(this); // Pass reference for further actions
+            idController.setUnstartedCommissionsController(this); // Pass reference for further actions
 
             Stage stage = new Stage();
             stage.setScene(new Scene(idRoot));
@@ -624,7 +635,7 @@ public class AllCommissionsController {
 
             NewCommissionController newCommissionController = loader.getController();
             newCommissionController.setUserId(userId);
-            newCommissionController.setAllCommissionsController(this);
+            newCommissionController.setUnstartedCommissionsController(this);
 
             Stage newStage = new Stage();
             Scene adminScene = new Scene(adminRoot);

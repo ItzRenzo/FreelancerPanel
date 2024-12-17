@@ -39,9 +39,19 @@ public class NewCommissionController {
     private TextArea NotesTA;
 
     private AllCommissionsController allcommissionsController;
+    private ActiveCommissionsController activecommissionsController;
+    private UnstartedCommissionsController unstartedcommissionsController;
 
     public void setAllCommissionsController(AllCommissionsController allcommissionsController) {
         this.allcommissionsController = allcommissionsController;
+    }
+
+    public void setActiveCommissionsController(ActiveCommissionsController activecommissionsController) {
+        this.activecommissionsController = activecommissionsController;
+    }
+
+    public void setUnstartedCommissionsController(UnstartedCommissionsController unstartedcommissionsController) {
+        this.unstartedcommissionsController = unstartedcommissionsController;
     }
 
     private int userId;
