@@ -19,8 +19,8 @@
             <Font name="Calibri Bold" size="15.0" />
          </font>
       </Button>
-      <Button fx:id="CreateAccountButton" layoutX="321.0" layoutY="444.0" mnemonicParsing="false" onMouseClicked="#CreateAccountClicked" style="-fx-background-color: black;" text="Create Account" textFill="#3c3d37" />
-      <ImageView fitHeight="273.0" fitWidth="266.0" layoutX="238.0" layoutY="129.0" pickOnBounds="true" preserveRatio="true">
+      <Button fx:id="CreateAccountButton" layoutX="321.0" layoutY="444.0" mnemonicParsing="false" onMouseClicked="#CreateAccountClicked" style="-fx-background-color: black;" text="Create Account" textFill="WHITE" />
+      <ImageView fitHeight="213.0" fitWidth="225.0" layoutX="264.0" layoutY="129.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/logo.png" />
          </image>

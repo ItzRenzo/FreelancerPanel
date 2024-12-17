@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="469.0" prefWidth="370.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.group.freelancerpanel.controllers.TOSGUIController">
+   <children>
+      <AnchorPane prefHeight="63.0" prefWidth="370.0" style="-fx-background-color: #282828;">
+         <children>
+            <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="321.0" layoutY="14.0" onMouseClicked="#CloseClicked" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/exit.png" />
+               </image>
+            </ImageView>
+            <Text fill="WHITE" layoutX="26.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Axiom Terms and Service">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="138.0" layoutY="413.0" onMouseClicked="#AcceptClicked" prefHeight="35.0" prefWidth="90.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 10;">
+         <children>
+            <Text layoutX="20.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Accept">
+               <font>
+                  <Font name="Calibri Bold" size="18.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <TextFlow fx:id="EnterIDText" layoutX="16.0" layoutY="74.0" prefHeight="35.0" prefWidth="200.0" />
+      <TextArea fx:id="TOSTextArea" layoutX="19.0" layoutY="77.0" prefHeight="315.0" prefWidth="332.0" />
+   </children>
+</Pane>
