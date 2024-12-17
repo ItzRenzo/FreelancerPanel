@@ -135,7 +135,7 @@
                   </AnchorPane>
                   <AnchorPane layoutX="42.0" layoutY="182.0" prefHeight="93.0" prefWidth="248.0" style="-fx-background-radius: 15;" styleClass="backgroundColor" stylesheets="@blue.css">
                      <children>
-                        <Text layoutX="14.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Open Change Reqeust">
+                        <Text layoutX="14.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Open Change Request">
                            <font>
                               <Font name="Century Gothic Bold" size="14.0" />
                            </font>
@@ -217,7 +217,7 @@
                   <Font name="Century Gothic Bold" size="14.0" />
                </font>
             </Text>
-            <Text fill="WHITE" layoutX="31.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="₱ 0">
+            <Text fx:id="ActiveCommissionValue" fill="WHITE" layoutX="31.0" layoutY="60.0" strokeType="OUTSIDE" strokeWidth="0.0" text="₱ 0">
                <font>
                   <Font size="24.0" />
                </font>

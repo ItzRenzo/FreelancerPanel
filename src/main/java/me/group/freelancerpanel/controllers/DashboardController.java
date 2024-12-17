@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -15,9 +18,37 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Set;
 
 public class DashboardController {
+
+    @FXML
+    private Text TotalCompletedCommissions;
+
+    @FXML
+    private Text ActiveCommissionValue;
+
+    @FXML
+    private Text TotalRevenue;
+
+    @FXML
+    private Text TotalOwed;
+
+    @FXML
+    private Text OpenChangeRequest;
+
+    @FXML
+    private BarChart<String, Number> RevenueByProduct;
+
+    @FXML
+    private BarChart<String, Number> MonthlyRevenue;
+
+    @FXML
+    private PieChart PopularProductsPieChart;
 
     @FXML
     private TreeView<String> CommissionTree;
@@ -43,6 +74,7 @@ public class DashboardController {
     public void setUserId(int userId) {
         this.userId = userId;
         System.out.println("DashboardController: User ID set to " + userId);
+        loadDashboardData();
     }
 
     // Setter for username
@@ -114,6 +146,208 @@ public class DashboardController {
             User_email.setText(email);
         }
     }
+
+    private void loadDashboardData() {
+        loadTotalCompletedCommissions();
+        loadActiveCommissionValue();
+        loadTotalRevenue();
+        loadTotalOwed();
+        loadOpenChangeRequests();
+        loadRevenueByProduct();
+        loadMonthlyRevenue();
+        loadPopularProductsPieChart();
+    }
+
+    private void loadPopularProductsPieChart() {
+        PopularProductsPieChart.getData().clear(); // Clear old data
+
+        String query = """
+        SELECT product_name, COUNT(commission.commission_id) AS total_commissions
+        FROM product
+        JOIN commission ON product.product_id = commission.product_id
+        WHERE commission.user_id = ? AND commission.commission_status = 'Completed'
+        GROUP BY product_name
+        ORDER BY total_commissions DESC
+        LIMIT 5;
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String productName = resultSet.getString("product_name");
+                int totalCommissions = resultSet.getInt("total_commissions");
+
+                PopularProductsPieChart.getData().add(new PieChart.Data(productName, totalCommissions));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private void loadTotalCompletedCommissions() {
+        String query = """
+        SELECT COUNT(*) AS total_completed
+        FROM commission
+        WHERE user_id = ? AND commission_status = 'Completed';
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                TotalCompletedCommissions.setText(String.valueOf(resultSet.getInt("total_completed")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadActiveCommissionValue() {
+        String query = """
+        SELECT SUM(commission_total_value) AS active_value
+        FROM commission
+        WHERE user_id = ? AND commission_status != 'Completed';
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                ActiveCommissionValue.setText("₱ " + resultSet.getDouble("active_value"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadTotalRevenue() {
+        String query = """
+        SELECT SUM(commission_total_value) AS total_revenue
+        FROM commission
+        WHERE user_id = ? AND commission_status = 'Completed';
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                TotalRevenue.setText("₱ " + resultSet.getDouble("total_revenue"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadTotalOwed() {
+        String query = """
+        SELECT SUM(commission_total_value - commission_total_paid) AS total_owed
+        FROM commission
+        WHERE user_id = ? AND commission_status != 'Completed';
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                TotalOwed.setText("₱ " + resultSet.getDouble("total_owed"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadOpenChangeRequests() {
+        String query = """
+        SELECT COUNT(*) AS open_requests
+        FROM request
+        WHERE user_id = ? AND request_status IN ('Not Started', 'In Progress', 'Paused');
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                OpenChangeRequest.setText(String.valueOf(resultSet.getInt("open_requests")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadRevenueByProduct() {
+        RevenueByProduct.getData().clear();
+
+        String query = """
+        SELECT product_name, SUM(commission_total_value) AS revenue
+        FROM product
+        JOIN commission ON product.product_id = commission.product_id
+        WHERE commission.user_id = ? AND commission_status = 'Completed'
+        GROUP BY product_name;
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Revenue");
+
+            while (resultSet.next()) {
+                series.getData().add(new XYChart.Data<>(resultSet.getString("product_name"), resultSet.getDouble("revenue")));
+            }
+
+            RevenueByProduct.getData().add(series);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadMonthlyRevenue() {
+        MonthlyRevenue.getData().clear();
+
+        String query = """
+        SELECT DATE_FORMAT(commission_start_date, '%Y-%m') AS month, SUM(commission_total_value) AS revenue
+        FROM commission
+        WHERE user_id = ?
+        GROUP BY DATE_FORMAT(commission_start_date, '%Y-%m');
+    """;
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Monthly Revenue");
+
+            while (resultSet.next()) {
+                series.getData().add(new XYChart.Data<>(resultSet.getString("month"), resultSet.getDouble("revenue")));
+            }
+
+            MonthlyRevenue.getData().add(series);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @FXML
     private void initializeCommissionTree() {
