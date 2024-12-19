@@ -1,59 +1,33 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 
-public class DashboardController {
-
-    @FXML
-    private Text TotalCompletedCommissions;
-
-    @FXML
-    private Text ActiveCommissionValue;
-
-    @FXML
-    private Text TotalRevenue;
-
-    @FXML
-    private Text TotalOwed;
-
-    @FXML
-    private Text OpenChangeRequest;
-
-    @FXML
-    private Text NumberCommissions;
-
-    @FXML
-    private BarChart<String, Number> RevenueByProduct;
-
-    @FXML
-    private BarChart<String, Number> MonthlyRevenue;
-
-    @FXML
-    private PieChart PopularProductsPieChart;
+public class ProfileController {
 
     @FXML
     private TreeView<String> CommissionTree;
@@ -61,6 +35,12 @@ public class DashboardController {
     private TreeView<String> RequestTree;
     @FXML
     private TreeView<String> QuotesTree;
+
+    @FXML
+    private Text ActiveCommissionValue;
+
+    @FXML
+    private Text NumberCommissions;
 
     @FXML
     private Text User_name;
@@ -72,6 +52,15 @@ public class DashboardController {
     private Text User_email;
 
     @FXML
+    private TextField UsernameTF;
+
+    @FXML
+    private TextField EmailTF;
+
+    @FXML
+    private ImageView TestProfilePic;
+
+    @FXML
     private ImageView ProfilePicture;
 
     private int userId;
@@ -81,8 +70,9 @@ public class DashboardController {
     // Setter for userId
     public void setUserId(int userId) {
         this.userId = userId;
-        System.out.println("DashboardController: User ID set to " + userId);
+        System.out.println("ProfileController: User ID set to " + userId);
         loadDashboardData();
+        initializeDragAndDrop();
         loadProfilePicture();
     }
 
@@ -91,17 +81,7 @@ public class DashboardController {
         this.username = username;
         if (User_name != null && User_name2 != null) { // Ensure UI components are initialized
             User_name.setText(username);
-            // Create the username text
-            Text usernameText = new Text(username);
-            usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
-
-            // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
-            overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
-
-            // Add both Text nodes to the TextFlow
-            User_name2.getChildren().clear(); // Clear any existing content
-            User_name2.getChildren().addAll(usernameText, overviewText);
+            UsernameTF.setText(username);
         }
     }
 
@@ -110,6 +90,74 @@ public class DashboardController {
         this.email = email;
         if (User_email != null) { // Ensure UI components are initialized
             User_email.setText(email);
+            EmailTF.setText(email);
+        }
+    }
+
+    @FXML
+    private void initializeDragAndDrop() {
+        TestProfilePic.setOnDragOver(event -> {
+            if (event.getGestureSource() != TestProfilePic && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        TestProfilePic.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasFiles()) {
+                File file = db.getFiles().get(0);
+                try {
+                    // Load and scale the image
+                    Image image = new Image(file.toURI().toString(), 200, 200, true, true);
+                    TestProfilePic.setImage(image);
+
+                    // Save file path in the database
+                    String query = "UPDATE Freelancer SET profile_picture = ? WHERE user_id = ?";
+                    try (Connection connection = DatabaseHandler.getConnection();
+                         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+                        preparedStatement.setString(1, file.getAbsolutePath());
+                        preparedStatement.setInt(2, userId);
+                        preparedStatement.executeUpdate();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "File Error", "Invalid Image File", e.getMessage());
+                }
+            }
+            event.setDropCompleted(true);
+            event.consume();
+        });
+    }
+
+    @FXML
+    private void loadProfilePicture() {
+        String query = "SELECT profile_picture FROM Freelancer WHERE user_id = ?";
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String filePath = resultSet.getString("profile_picture");
+                if (filePath != null && !filePath.isEmpty()) {
+                    File file = new File(filePath);
+                    if (file.exists()) {
+                        // Load the image for TestProfilePic (200x200)
+                        Image largeImage = new Image(file.toURI().toString(), 200, 200, true, true);
+                        TestProfilePic.setImage(largeImage);
+
+                        // Load the image for ProfilePicture (43x43)
+                        Image smallImage = new Image(file.toURI().toString(), 43, 43, true, true);
+                        ProfilePicture.setImage(smallImage);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Profile Picture", e.getMessage());
         }
     }
 
@@ -119,6 +167,9 @@ public class DashboardController {
         initializeCommissionTree();
         initializeRequestTree();
         initializeQuotesTree();
+
+        UsernameTF.setStyle("-fx-text-fill: black; -fx-background-color: white; -fx-border-color: lightgray;");
+        EmailTF.setStyle("-fx-text-fill: black; -fx-background-color: white; -fx-border-color: lightgray;");
 
         CommissionTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.getValue().equals("All commissions")) {
@@ -174,7 +225,7 @@ public class DashboardController {
             usernameText.setStyle("-fx-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Create the " / Overview" text
-            Text overviewText = new Text(" / Overview");
+            Text overviewText = new Text(" / Products");
             overviewText.setStyle("-fx-fill: #aeaeae; -fx-font-size: 14px; -fx-font-weight: bold;");
 
             // Add both Text nodes to the TextFlow
@@ -186,42 +237,8 @@ public class DashboardController {
         }
     }
 
-    @FXML
-    private void loadProfilePicture() {
-        String query = "SELECT profile_picture FROM Freelancer WHERE user_id = ?";
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                String filePath = resultSet.getString("profile_picture");
-                if (filePath != null && !filePath.isEmpty()) {
-                    File file = new File(filePath);
-                    if (file.exists()) {
-
-                        // Load the image for ProfilePicture (43x43)
-                        Image smallImage = new Image(file.toURI().toString(), 43, 43, true, true);
-                        ProfilePicture.setImage(smallImage);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Profile Picture", e.getMessage());
-        }
-    }
-
     private void loadDashboardData() {
-        loadTotalCompletedCommissions();
         loadActiveCommissionValue();
-        loadTotalRevenue();
-        loadTotalOwed();
-        loadOpenChangeRequests();
-        loadRevenueByProduct();
-        loadMonthlyRevenue();
-        loadPopularProductsPieChart();
         loadNumberCommissions();
     }
 
@@ -278,179 +295,6 @@ public class DashboardController {
         alert.showAndWait();
     }
 
-    private void loadPopularProductsPieChart() {
-        PopularProductsPieChart.getData().clear(); // Clear old data
-
-        String query = """
-    SELECT product_name, COUNT(commission.commission_id) AS total_commissions
-    FROM product
-    JOIN commission ON product.product_id = commission.product_id
-    WHERE commission.user_id = ? AND commission.commission_status = 'Completed'
-    GROUP BY product_name
-    ORDER BY total_commissions DESC
-    LIMIT 5;
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String productName = resultSet.getString("product_name");
-                int totalCommissions = resultSet.getInt("total_commissions");
-
-                PieChart.Data data = new PieChart.Data(productName, totalCommissions);
-                PopularProductsPieChart.getData().add(data);
-
-                data.getNode().setStyle("-fx-text-fill: white;");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-
-    private void loadTotalCompletedCommissions() {
-        String query = """
-        SELECT COUNT(*) AS total_completed
-        FROM commission
-        WHERE user_id = ? AND commission_status = 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                TotalCompletedCommissions.setText(String.valueOf(resultSet.getInt("total_completed")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadTotalRevenue() {
-        String query = """
-        SELECT SUM(commission_total_value) AS total_revenue
-        FROM commission
-        WHERE user_id = ? AND commission_status = 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                TotalRevenue.setText("₱ " + resultSet.getDouble("total_revenue"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadTotalOwed() {
-        String query = """
-        SELECT SUM(commission_total_value - commission_total_paid) AS total_owed
-        FROM commission
-        WHERE user_id = ? AND commission_status != 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                TotalOwed.setText("₱ " + resultSet.getDouble("total_owed"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadOpenChangeRequests() {
-        String query = """
-        SELECT COUNT(*) AS open_requests
-        FROM request
-        WHERE user_id = ? AND request_status IN ('Not Started', 'In Progress', 'Paused');
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                OpenChangeRequest.setText(String.valueOf(resultSet.getInt("open_requests")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadRevenueByProduct() {
-        RevenueByProduct.getData().clear();
-
-        String query = """
-        SELECT product_name, SUM(commission_total_value) AS revenue
-        FROM product
-        JOIN commission ON product.product_id = commission.product_id
-        WHERE commission.user_id = ? AND commission_status = 'Completed'
-        GROUP BY product_name;
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Revenue");
-
-            while (resultSet.next()) {
-                series.getData().add(new XYChart.Data<>(resultSet.getString("product_name"), resultSet.getDouble("revenue")));
-            }
-
-            RevenueByProduct.getData().add(series);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadMonthlyRevenue() {
-        MonthlyRevenue.getData().clear();
-
-        String query = """
-        SELECT DATE_FORMAT(commission_start_date, '%Y-%m') AS month, SUM(commission_total_value) AS revenue
-        FROM commission
-        WHERE user_id = ?
-        GROUP BY DATE_FORMAT(commission_start_date, '%Y-%m');
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Monthly Revenue");
-
-            while (resultSet.next()) {
-                series.getData().add(new XYChart.Data<>(resultSet.getString("month"), resultSet.getDouble("revenue")));
-            }
-
-            MonthlyRevenue.getData().add(series);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @FXML
     private void initializeCommissionTree() {
@@ -840,15 +684,119 @@ public class DashboardController {
         }
     }
 
+    @FXML
+    public void ChangePassClicked(MouseEvent event) {
+        String currentPassword = JOptionPane.showInputDialog("Enter your current password:");
+        if (currentPassword == null || currentPassword.isEmpty()) {
+            return; // User cancelled
+        }
+
+        String query = "SELECT password FROM Freelancer WHERE user_id = ?";
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next() && resultSet.getString("password").equals(currentPassword)) {
+                // Password matches, prompt for new password
+                String newPassword = JOptionPane.showInputDialog("Enter your new password:");
+                String confirmPassword = JOptionPane.showInputDialog("Confirm your new password:");
+
+                if (newPassword.equals(confirmPassword)) {
+                    String updateQuery = "UPDATE Freelancer SET password = ? WHERE user_id = ?";
+                    try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                        updateStatement.setString(1, newPassword);
+                        updateStatement.setInt(2, userId);
+                        int rowsUpdated = updateStatement.executeUpdate();
+
+                        if (rowsUpdated > 0) {
+                            JOptionPane.showMessageDialog(null, "Password successfully updated.");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Failed to update password.");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Passwords do not match.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Incorrect current password.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "An error occurred while validating your password.");
+        }
+    }
+
+    @FXML
+    public void EditClicked(MouseEvent event) {
+        String newUsername = UsernameTF.getText();
+        String newEmail = EmailTF.getText();
+
+        if (newUsername.isEmpty() || newEmail.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "All fields are required.", "Please fill in both Username and Email.");
+            return;
+        }
+
+        String query = "UPDATE Freelancer SET username = ?, email = ? WHERE user_id = ?";
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, newUsername);
+            preparedStatement.setString(2, newEmail);
+            preparedStatement.setInt(3, userId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Profile Updated", "Your profile details have been successfully updated.");
+                setUsername(newUsername);
+                setUserEmail(newEmail);
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Update Failed", "Error Updating Profile", "Please try again.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Error Updating Profile", e.getMessage());
+        }
+    }
+
+
+
+    @FXML
+    public void LogoutClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/FrontPage.fxml"));
+            Parent frontPage = loader.load();
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(frontPage);
+
+            stage.setScene(scene);
+
+            // Center manually
+            javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
+            javafx.geometry.Rectangle2D bounds = screen.getVisualBounds();
+
+            stage.setX((bounds.getWidth() - stage.getWidth()) / 2);
+            stage.setY((bounds.getHeight() - stage.getHeight()) / 2);
+
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public void ProfileClicked(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Profile.fxml"));
             Parent AdminRoot = loader.load();
 
-            ProfileController profileController = loader.getController();
-            profileController.setUserId(userId);
-            profileController.setUsername(username);
-            profileController.setUserEmail(email);
+            ProductController productController = loader.getController();
+            productController.setUserId(userId);
+            productController.setUsername(username);
+            productController.setUserEmail(email);
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene AdminScene = new Scene(AdminRoot);

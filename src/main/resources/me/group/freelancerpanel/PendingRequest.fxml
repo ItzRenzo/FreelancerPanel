@@ -190,9 +190,9 @@
             </Text>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="6.0" layoutY="689.0" prefHeight="69.0" prefWidth="299.0">
+      <AnchorPane layoutX="6.0" layoutY="689.0" onMouseClicked="#ProfileClicked" prefHeight="69.0" prefWidth="299.0">
          <children>
-            <ImageView fitHeight="43.0" fitWidth="43.0" layoutX="38.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="ProfilePicture" fitHeight="43.0" fitWidth="43.0" layoutX="38.0" layoutY="13.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@images/user.png" />
                </image>

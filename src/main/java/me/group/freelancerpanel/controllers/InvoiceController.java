@@ -16,6 +16,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -79,6 +80,9 @@ public class InvoiceController {
     @FXML
     private Text User_email;
 
+    @FXML
+    private ImageView ProfilePicture;
+
     private int userId;
     private String username;
     private String email;
@@ -89,6 +93,7 @@ public class InvoiceController {
         System.out.println("InvoiceController: User ID set to " + userId);
         loadInvoiceData(); // Ensure data is loaded after userId is set
         loadDashboardData();
+        loadProfilePicture();
     }
 
     // Setter for username
@@ -213,6 +218,33 @@ public class InvoiceController {
         }
         if (email != null) {
             User_email.setText(email);
+        }
+    }
+
+    @FXML
+    private void loadProfilePicture() {
+        String query = "SELECT profile_picture FROM Freelancer WHERE user_id = ?";
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String filePath = resultSet.getString("profile_picture");
+                if (filePath != null && !filePath.isEmpty()) {
+                    File file = new File(filePath);
+                    if (file.exists()) {
+
+                        // Load the image for ProfilePicture (43x43)
+                        Image smallImage = new Image(file.toURI().toString(), 43, 43, true, true);
+                        ProfilePicture.setImage(smallImage);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Profile Picture", e.getMessage());
         }
     }
 
@@ -765,6 +797,26 @@ public class InvoiceController {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error loading NewInvoice.fxml: " + e.getMessage());
+        }
+    }
+
+    public void ProfileClicked(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Profile.fxml"));
+            Parent AdminRoot = loader.load();
+
+            ProfileController profileController = loader.getController();
+            profileController.setUserId(userId);
+            profileController.setUsername(username);
+            profileController.setUserEmail(email);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene AdminScene = new Scene(AdminRoot);
+            stage.setScene(AdminScene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Profile.fxml: " + e.getMessage());
         }
     }
 }

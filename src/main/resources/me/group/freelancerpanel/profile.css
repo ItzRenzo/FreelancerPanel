@@ -1,0 +1,5 @@
+.text-field {
+    -fx-text-fill: black;
+    -fx-background-color: white;
+    -fx-border-color: lightgray;
+}
