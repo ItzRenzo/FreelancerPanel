@@ -1,5 +1,6 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class LoginController {
     @FXML
@@ -47,14 +49,14 @@ public class LoginController {
 
 
 
-    @FXML
-    public void LoginClicked(MouseEvent event) {
-        String userText = UserTF.getText();
-        String pwdText = PasswordTF.getText();
+public void LoginClicked(MouseEvent event) {
+    String userText = UserTF.getText();
+    String pwdText = PasswordTF.getText();
 
-        if (userText.isEmpty() || (pwdText.isEmpty() && !showpass.isSelected())) {
-            JOptionPane.showMessageDialog(null, "Username or Password is empty");
-        } else {
+    if (userText.isEmpty() || (pwdText.isEmpty() && !showpass.isSelected())) {
+        JOptionPane.showMessageDialog(null, "Username or Password is empty");
+    } else {
+        CompletableFuture.runAsync(() -> {
             try (Connection connection = me.group.freelancerpanel.controllers.DatabaseHandler.getConnection();
                  PreparedStatement statement = connection.prepareStatement(
                          "SELECT user_id, username, email FROM Freelancer WHERE username = ? AND password = ?")) {
@@ -73,40 +75,48 @@ public class LoginController {
                         String username = resultSet.getString("username");
                         String email = resultSet.getString("email");
 
-                        JOptionPane.showMessageDialog(null, "Login Successful");
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(null, "Login Successful");
 
-                        // Load the Dashboard
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
-                        Parent adminRoot = loader.load();
+                            try {
+                                // Load the Dashboard
+                                FXMLLoader loader = new FXMLLoader(getClass().getResource("/me/group/freelancerpanel/Dashboard.fxml"));
+                                Parent adminRoot = loader.load();
 
-                        // Pass the user_id, username, and email to the next controller
-                        DashboardController dashboardController = loader.getController();
-                        dashboardController.setUserId(userId);
-                        dashboardController.setUsername(username);
-                        dashboardController.setUserEmail(email);
+                                // Pass the user_id, username, and email to the next controller
+                                DashboardController dashboardController = loader.getController();
+                                dashboardController.setUserId(userId);
+                                dashboardController.setUsername(username);
+                                dashboardController.setUserEmail(email);
 
-                        // Set the scene
-                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                        Scene adminScene = new Scene(adminRoot);
-                        stage.setScene(adminScene);
+                                // Set the scene
+                                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                                Scene adminScene = new Scene(adminRoot);
+                                Platform.runLater(() -> stage.setScene(adminScene));
 
-                        // Center the stage
-                        stage.centerOnScreen();
-                        stage.show();
+                                Platform.runLater(() -> {
+                                    stage.centerOnScreen();
+                                    stage.show();
+                                });
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
                     } else {
-                        JOptionPane.showMessageDialog(null, "Login Failed. Please try again!");
-                        UserTF.setText("");
-                        PasswordTF.setText("");
-                        UserTF.requestFocus();
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(null, "Login Failed. Please try again!");
+                            UserTF.setText("");
+                            PasswordTF.setText("");
+                            UserTF.requestFocus();
+                        });
                     }
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-        }
+        });
     }
+}
 
 
 

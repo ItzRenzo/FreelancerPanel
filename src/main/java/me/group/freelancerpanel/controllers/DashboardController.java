@@ -1,5 +1,8 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -25,6 +28,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DashboardController {
 
@@ -226,48 +231,64 @@ public class DashboardController {
     }
 
     private void loadActiveCommissionValue() {
-        String query = """
-        SELECT SUM(commission_total_value) AS active_value
-        FROM commission
-        WHERE user_id = ? AND commission_status != 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                ActiveCommissionValue.setText("₱ " + resultSet.getDouble("active_value"));
+        Task<Double> task = new Task<>() {
+            @Override
+            protected Double call() throws Exception {
+                String query = """
+                SELECT SUM(commission_total_value) AS active_value
+                FROM commission
+                WHERE user_id = ? AND commission_status != 'Completed';
+            """;
+                try (Connection connection = DatabaseHandler.getConnection();
+                     PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setInt(1, userId);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        return resultSet.getDouble("active_value");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Active Commission Value", e.getMessage());
+                }
+                return 0.0;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        };
+
+        task.setOnSucceeded(event -> ActiveCommissionValue.setText("₱ " + task.getValue()));
+        task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Active Commission Value", "An error occurred while loading active commission value."));
+
+        new Thread(task).start();
     }
 
     private void loadNumberCommissions() {
-        String query = """
-            SELECT COUNT(*) AS open_commissions
-            FROM commission
-            WHERE user_id = ?
-            AND commission_status IN ('Not Started', 'In Progress', 'Paused');
-            """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                int openCommissions = resultSet.getInt("open_commissions");
-                NumberCommissions.setText(openCommissions + " Commissions");
+        Task<Integer> task = new Task<>() {
+            @Override
+            protected Integer call() throws Exception {
+                String query = """
+                    SELECT COUNT(*) AS open_commissions
+                    FROM commission
+                    WHERE user_id = ?
+                    AND commission_status IN ('Not Started', 'In Progress', 'Paused');
+                """;
+                try (Connection connection = DatabaseHandler.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setInt(1, userId);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        return resultSet.getInt("open_commissions");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Commissions", e.getMessage());
+                }
+                return 0;
             }
+        };
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Commissions", e.getMessage());
-        }
+        task.setOnSucceeded(event -> NumberCommissions.setText(task.getValue() + " Commissions"));
+        task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Commissions", "An error occurred while loading open commissions."));
+
+        new Thread(task).start();
     }
 
     private void showAlert(Alert.AlertType type, String title, String header, String content) {
@@ -279,121 +300,159 @@ public class DashboardController {
     }
 
     private void loadPopularProductsPieChart() {
-        PopularProductsPieChart.getData().clear(); // Clear old data
-
-        String query = """
-    SELECT product_name, COUNT(commission.commission_id) AS total_commissions
-    FROM product
-    JOIN commission ON product.product_id = commission.product_id
-    WHERE commission.user_id = ? AND commission.commission_status = 'Completed'
-    GROUP BY product_name
-    ORDER BY total_commissions DESC
-    LIMIT 5;
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String productName = resultSet.getString("product_name");
-                int totalCommissions = resultSet.getInt("total_commissions");
-
-                PieChart.Data data = new PieChart.Data(productName, totalCommissions);
-                PopularProductsPieChart.getData().add(data);
-
-                data.getNode().setStyle("-fx-text-fill: white;");
+        Task<ObservableList<PieChart.Data>> task = new Task<>() {
+            @Override
+            protected ObservableList<PieChart.Data> call() throws Exception {
+                ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
+                String query = """
+                    SELECT product_name, COUNT(commission.commission_id) AS total_commissions
+                    FROM product
+                    JOIN commission ON product.product_id = commission.product_id
+                    WHERE commission.user_id = ? AND commission.commission_status = 'Completed'
+                    GROUP BY product_name
+                    ORDER BY total_commissions DESC
+                    LIMIT 5;
+                """;
+                try (Connection connection = DatabaseHandler.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setInt(1, userId);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    while (resultSet.next()) {
+                        data.add(new PieChart.Data(resultSet.getString("product_name"), resultSet.getInt("total_commissions")));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Popular Products", e.getMessage());
+                }
+                return data;
             }
+        };
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        task.setOnSucceeded(event -> PopularProductsPieChart.setData(task.getValue()));
+        task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Popular Products", "An error occurred while loading popular products."));
+
+        new Thread(task).start();
     }
-
-
-
 
     private void loadTotalCompletedCommissions() {
-        String query = """
-        SELECT COUNT(*) AS total_completed
-        FROM commission
-        WHERE user_id = ? AND commission_status = 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                TotalCompletedCommissions.setText(String.valueOf(resultSet.getInt("total_completed")));
+    Task<Integer> task = new Task<>() {
+        @Override
+        protected Integer call() throws Exception {
+            String query = """
+                SELECT COUNT(*) AS total_completed
+                FROM commission
+                WHERE user_id = ? AND commission_status = 'Completed';
+            """;
+            try (Connection connection = DatabaseHandler.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, userId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("total_completed");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Total Completed Commissions", e.getMessage());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return 0;
         }
-    }
+    };
+
+    task.setOnSucceeded(event -> TotalCompletedCommissions.setText(String.valueOf(task.getValue())));
+    task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Total Completed Commissions", "An error occurred while loading total completed commissions."));
+
+    new Thread(task).start();
+}
 
     private void loadTotalRevenue() {
-        String query = """
-        SELECT SUM(commission_total_value) AS total_revenue
-        FROM commission
-        WHERE user_id = ? AND commission_status = 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                TotalRevenue.setText("₱ " + resultSet.getDouble("total_revenue"));
+    Task<Double> task = new Task<>() {
+        @Override
+        protected Double call() throws Exception {
+            String query = """
+                SELECT SUM(commission_total_value) AS total_revenue
+                FROM commission
+                WHERE user_id = ? AND commission_status = 'Completed';
+            """;
+            try (Connection connection = DatabaseHandler.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, userId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getDouble("total_revenue");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Total Revenue", e.getMessage());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return 0.0;
         }
-    }
+    };
+
+    task.setOnSucceeded(event -> TotalRevenue.setText("₱ " + task.getValue()));
+    task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Total Revenue", "An error occurred while loading total revenue."));
+
+    new Thread(task).start();
+}
 
     private void loadTotalOwed() {
-        String query = """
-        SELECT SUM(commission_total_value - commission_total_paid) AS total_owed
-        FROM commission
-        WHERE user_id = ? AND commission_status != 'Completed';
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                TotalOwed.setText("₱ " + resultSet.getDouble("total_owed"));
+    Task<Double> task = new Task<>() {
+        @Override
+        protected Double call() throws Exception {
+            String query = """
+                SELECT SUM(commission_total_value - commission_total_paid) AS total_owed
+                FROM commission
+                WHERE user_id = ? AND commission_status != 'Completed';
+            """;
+            try (Connection connection = DatabaseHandler.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, userId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getDouble("total_owed");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Total Owed", e.getMessage());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return 0.0;
         }
-    }
+    };
+
+    task.setOnSucceeded(event -> TotalOwed.setText("₱ " + task.getValue()));
+    task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Total Owed", "An error occurred while loading total owed."));
+
+    new Thread(task).start();
+}
 
     private void loadOpenChangeRequests() {
-        String query = """
-        SELECT COUNT(*) AS open_requests
-        FROM request
-        WHERE user_id = ? AND request_status IN ('Not Started', 'In Progress', 'Paused');
-    """;
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                OpenChangeRequest.setText(String.valueOf(resultSet.getInt("open_requests")));
+    Task<Integer> task = new Task<>() {
+        @Override
+        protected Integer call() throws Exception {
+            String query = """
+                SELECT COUNT(*) AS open_requests
+                FROM request
+                WHERE user_id = ? AND request_status IN ('Not Started', 'In Progress', 'Paused');
+            """;
+            try (Connection connection = DatabaseHandler.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, userId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("open_requests");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Change Requests", e.getMessage());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return 0;
         }
-    }
+    };
+
+    task.setOnSucceeded(event -> OpenChangeRequest.setText(String.valueOf(task.getValue())));
+    task.setOnFailed(event -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Open Change Requests", "An error occurred while loading open change requests."));
+
+    new Thread(task).start();
+}
 
     private void loadRevenueByProduct() {
         RevenueByProduct.getData().clear();

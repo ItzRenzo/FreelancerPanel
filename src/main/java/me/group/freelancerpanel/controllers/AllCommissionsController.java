@@ -1,5 +1,6 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,6 +20,7 @@ import javafx.stage.StageStyle;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.concurrent.CompletableFuture;
 
 public class AllCommissionsController {
 
@@ -297,10 +299,11 @@ public class AllCommissionsController {
         alert.showAndWait();
     }
 
-    public void loadCommissionData() {
-        // ObservableList to hold commission data
-        ObservableList<Commission> commissions = FXCollections.observableArrayList();
+public void loadCommissionData() {
+    // ObservableList to hold commission data
+    ObservableList<Commission> commissions = FXCollections.observableArrayList();
 
+    CompletableFuture.runAsync(() -> {
         try {
             // Assuming a database connection is established
             Connection connection = DatabaseHandler.getConnection();
@@ -341,13 +344,14 @@ public class AllCommissionsController {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Commissions",
-                    "An error occurred while loading commissions: " + e.getMessage());
+            Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Commissions",
+                    "An error occurred while loading commissions: " + e.getMessage()));
         }
 
-        // Set the filtered data to the TableView
-        commissionTable.setItems(commissions);
-    }
+        // Update the TableView on the JavaFX Application Thread
+        Platform.runLater(() -> commissionTable.setItems(commissions));
+    });
+}
 
 
     @FXML

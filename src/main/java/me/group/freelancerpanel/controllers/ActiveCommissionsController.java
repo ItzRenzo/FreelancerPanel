@@ -1,5 +1,6 @@
 package me.group.freelancerpanel.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -297,62 +298,64 @@ public class ActiveCommissionsController {
         alert.showAndWait();
     }
 
+
     public void loadCommissionData() {
         // ObservableList to hold commission data
         ObservableList<Commission> commissions = FXCollections.observableArrayList();
 
-        try {
-            // Get a database connection
-            Connection connection = DatabaseHandler.getConnection();
+        // Run database operations asynchronously
+        new Thread(() -> {
+            try {
+                // Get a database connection
+                Connection connection = DatabaseHandler.getConnection();
 
-            // SQL query to filter commissions with status "In Progress" or "Paused" and user_id
-            String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
-                    "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
-                    "p.product_name, c.commission_status " +
-                    "FROM commission c " +
-                    "LEFT JOIN client cl ON c.client_id = cl.client_id " +
-                    "LEFT JOIN product p ON c.product_id = p.product_id " +
-                    "WHERE (c.commission_status = ? OR c.commission_status = ?) AND c.user_id = ?";
+                // SQL query to filter commissions with status "In Progress" or "Paused" and user_id
+                String query = "SELECT c.commission_id, c.commission_title, cl.client_name, c.commission_total_value, " +
+                        "c.commission_total_paid, c.commission_start_date, c.commission_deadline, " +
+                        "p.product_name, c.commission_status " +
+                        "FROM commission c " +
+                        "LEFT JOIN client cl ON c.client_id = cl.client_id " +
+                        "LEFT JOIN product p ON c.product_id = p.product_id " +
+                        "WHERE (c.commission_status = ? OR c.commission_status = ?) AND c.user_id = ?";
 
-            // Use PreparedStatement for query execution with parameters
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, "In Progress"); // First parameter: "In Progress"
-            preparedStatement.setString(2, "Paused");      // Second parameter: "Paused"
-            preparedStatement.setInt(3, userId);           // Third parameter: user_id to filter by user
+                // Use PreparedStatement for query execution with parameters
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, "In Progress"); // First parameter: "In Progress"
+                preparedStatement.setString(2, "Paused");      // Second parameter: "Paused"
+                preparedStatement.setInt(3, userId);           // Third parameter: user_id to filter by user
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+                ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
-                // Populate the Commission object with the data
-                commissions.add(new Commission(
-                        resultSet.getInt("commission_id"),
-                        resultSet.getString("commission_title"),
-                        resultSet.getString("client_name"), // Fetch client_name instead of client_id
-                        resultSet.getDouble("commission_total_value"),
-                        resultSet.getDouble("commission_total_paid"),
-                        resultSet.getString("commission_start_date"),
-                        resultSet.getString("commission_deadline"),
-                        resultSet.getString("product_name"), // Fetch product_name instead of product_id
-                        resultSet.getString("commission_status")
-                ));
+                while (resultSet.next()) {
+                    // Populate the Commission object with the data
+                    commissions.add(new Commission(
+                            resultSet.getInt("commission_id"),
+                            resultSet.getString("commission_title"),
+                            resultSet.getString("client_name"), // Fetch client_name instead of client_id
+                            resultSet.getDouble("commission_total_value"),
+                            resultSet.getDouble("commission_total_paid"),
+                            resultSet.getString("commission_start_date"),
+                            resultSet.getString("commission_deadline"),
+                            resultSet.getString("product_name"), // Fetch product_name instead of product_id
+                            resultSet.getString("commission_status")
+                    ));
+                }
+
+                // Close the connection and statement
+                resultSet.close();
+                preparedStatement.close();
+                connection.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Commissions",
+                        "An error occurred while loading active commissions: " + e.getMessage());
             }
 
-            // Close the connection and statement
-            resultSet.close();
-            preparedStatement.close();
-            connection.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Load Commissions",
-                    "An error occurred while loading active commissions: " + e.getMessage());
-        }
-
-        // Set the filtered data to the TableView
-        commissionTable.setItems(commissions);
+            // Update the TableView on the JavaFX Application Thread
+            Platform.runLater(() -> commissionTable.setItems(commissions));
+        }).start();
     }
-
-
 
     @FXML
     private void initializeCommissionTree() {
