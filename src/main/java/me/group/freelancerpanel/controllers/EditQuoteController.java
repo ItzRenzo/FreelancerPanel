@@ -9,6 +9,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -165,78 +168,111 @@ public class EditQuoteController {
     }
 
     public void EditClicked(MouseEvent event) {
-        String title = TitleTF.getText();
-        Client selectedClient = ClientComboBox.getValue();
-        String proposedPriceText = ProposedPriceTF.getText();
-        LocalDate startDate = StartDate.getValue();
-        LocalDate deadline = Deadline.getValue();
-        String paymentTerms = PaymentTermsComboBox.getValue();
-        String status = StatusComboBox.getValue();
+    String title = TitleTF.getText();
+    Client selectedClient = ClientComboBox.getValue();
+    String proposedPriceText = ProposedPriceTF.getText();
+    LocalDate startDate = StartDate.getValue();
+    LocalDate deadline = Deadline.getValue();
+    String paymentTerms = PaymentTermsComboBox.getValue();
+    String status = StatusComboBox.getValue();
 
-        if (title == null || title.isEmpty() ||
-                selectedClient == null ||
-                proposedPriceText == null || proposedPriceText.isEmpty() ||
-                startDate == null || deadline == null ||
-                paymentTerms == null || status == null) {
+    if (title == null || title.isEmpty() ||
+            selectedClient == null ||
+            proposedPriceText == null || proposedPriceText.isEmpty() ||
+            startDate == null || deadline == null ||
+            paymentTerms == null || status == null) {
 
-            showAlert(Alert.AlertType.WARNING, "Missing Information", "All fields are required.",
-                    "Please fill in all fields before proceeding.");
-            return;
-        }
+        showAlert(Alert.AlertType.WARNING, "Missing Information", "All fields are required.",
+                "Please fill in all fields before proceeding.");
+        return;
+    }
 
-        BigDecimal proposedPrice;
-        try {
-            proposedPrice = new BigDecimal(proposedPriceText);
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Invalid Input", "Invalid Proposed Price",
-                    "Please enter a valid number for the proposed price.");
-            return;
-        }
+    BigDecimal proposedPrice;
+    try {
+        proposedPrice = new BigDecimal(proposedPriceText);
+    } catch (NumberFormatException e) {
+        showAlert(Alert.AlertType.ERROR, "Invalid Input", "Invalid Proposed Price",
+                "Please enter a valid number for the proposed price.");
+        return;
+    }
 
-        String updateQuery = "UPDATE quote SET quote_title = ?, client_id = ?, quote_price = ?, quote_start_date = ?, " +
-                "quote_deadline = ?, quote_payment_terms = ?, quote_status = ? WHERE quote_id = ?";
+    String updateQuery = "UPDATE quote SET quote_title = ?, client_id = ?, quote_price = ?, quote_start_date = ?, " +
+            "quote_deadline = ?, quote_payment_terms = ?, quote_status = ? WHERE quote_id = ?";
 
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+    try (Connection connection = DatabaseHandler.getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
-            preparedStatement.setString(1, title);
-            preparedStatement.setInt(2, selectedClient.getId());
-            preparedStatement.setBigDecimal(3, proposedPrice);
-            preparedStatement.setDate(4, java.sql.Date.valueOf(startDate));
-            preparedStatement.setDate(5, java.sql.Date.valueOf(deadline));
-            preparedStatement.setString(6, paymentTerms);
-            preparedStatement.setString(7, status);
-            preparedStatement.setInt(8, quoteId);
+        preparedStatement.setString(1, title);
+        preparedStatement.setInt(2, selectedClient.getId());
+        preparedStatement.setBigDecimal(3, proposedPrice);
+        preparedStatement.setDate(4, java.sql.Date.valueOf(startDate));
+        preparedStatement.setDate(5, java.sql.Date.valueOf(deadline));
+        preparedStatement.setString(6, paymentTerms);
+        preparedStatement.setString(7, status);
+        preparedStatement.setInt(8, quoteId);
 
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected == 1) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Quote Updated",
-                        "The quote has been successfully updated.");
+        int rowsAffected = preparedStatement.executeUpdate();
+        if (rowsAffected == 1) {
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Quote Updated",
+                    "The quote has been successfully updated.");
 
-                if (allquotesController != null) {
-                    allquotesController.loadQuoteData();
-                }
+            // Update the text file with the new quote details
+            editQuoteTextFile(quoteId, title, proposedPrice, startDate.toString(), deadline.toString(), selectedClient.getName(), paymentTerms);
 
-                if (pendingquotesController != null) {
-                    pendingquotesController.loadQuoteData();
-                }
-
-                if (acceptedquotesController != null) {
-                    acceptedquotesController.loadQuoteData();
-                }
-
-                closeWindow(event);
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed to Update Quote",
-                        "An error occurred while updating the quote. Please try again.");
+            if (allquotesController != null) {
+                allquotesController.loadQuoteData();
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Update Quote",
-                    "An error occurred while connecting to the database: " + e.getMessage());
+            if (pendingquotesController != null) {
+                pendingquotesController.loadQuoteData();
+            }
+
+            if (acceptedquotesController != null) {
+                acceptedquotesController.loadQuoteData();
+            }
+
+            closeWindow(event);
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to Update Quote",
+                    "An error occurred while updating the quote. Please try again.");
         }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to Update Quote",
+                "An error occurred while connecting to the database: " + e.getMessage());
     }
+}
+
+private void editQuoteTextFile(int quoteId, String title, BigDecimal price, String startDate, String deadline, String clientName, String paymentTerms) {
+    String termsAndAgreement = """
+        TERMS AND AGREEMENT FOR THE COMMISSION
+
+        1. The client agrees to the proposed price and payment terms.
+        2. The client agrees to the start date and deadline.
+        3. The client agrees to provide necessary information and resources for the project.
+        4. The client agrees to the terms of service as outlined in the application.
+        """;
+
+    String content = String.format("""
+        Quote Title: %s
+        Quote Price: %s
+        Start Date: %s
+        Deadline: %s
+        Client Name: %s
+        Payment Terms: %s
+
+        %s
+        """, title, price, startDate, deadline, clientName, paymentTerms, termsAndAgreement);
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(quoteId + "_quote.txt"))) {
+        writer.write(content);
+    } catch (IOException e) {
+        e.printStackTrace();
+        showAlert(Alert.AlertType.ERROR, "File Error", "Failed to Edit Quote File",
+                "An error occurred while editing the quote file: " + e.getMessage());
+    }
+}
 
     private void showAlert(Alert.AlertType type, String title, String header, String content) {
         Alert alert = new Alert(type);

@@ -10,6 +10,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -112,67 +115,76 @@ public class NewQuoteController {
     }
 
     public void CreateClicked(MouseEvent event) {
-        String titleText = TitleTF.getText();
-        Client selectedClient = (Client) ClientComboBox.getValue(); // Cast to Client
-        String proposedPriceText = ProposedPriceTF.getText();
-        Object startDate = StartDate.getValue();
-        Object deadlineDate = Deadline.getValue();
-        Object paymentTermsSelection = PaymentTermsComboBox.getValue();
-        Object statusSelection = StatusComboBox.getValue();
+    String titleText = TitleTF.getText();
+    Client selectedClient = (Client) ClientComboBox.getValue(); // Cast to Client
+    String proposedPriceText = ProposedPriceTF.getText();
+    Object startDate = StartDate.getValue();
+    Object deadlineDate = Deadline.getValue();
+    Object paymentTermsSelection = PaymentTermsComboBox.getValue();
+    Object statusSelection = StatusComboBox.getValue();
 
-        // Validate input fields
-        if (titleText == null || titleText.isEmpty() ||
-                selectedClient == null ||
-                proposedPriceText == null || proposedPriceText.isEmpty() ||
-                startDate == null ||
-                deadlineDate == null ||
-                paymentTermsSelection == null ||
-                statusSelection == null) {
+    // Validate input fields
+    if (titleText == null || titleText.isEmpty() ||
+            selectedClient == null ||
+            proposedPriceText == null || proposedPriceText.isEmpty() ||
+            startDate == null ||
+            deadlineDate == null ||
+            paymentTermsSelection == null ||
+            statusSelection == null) {
 
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Missing Information");
-            alert.setHeaderText("All fields are required");
-            alert.setContentText("Please fill in all fields before proceeding.");
-            alert.showAndWait();
-            return;
-        }
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Missing Information");
+        alert.setHeaderText("All fields are required");
+        alert.setContentText("Please fill in all fields before proceeding.");
+        alert.showAndWait();
+        return;
+    }
 
-        BigDecimal proposedPrice;
-        try {
-            proposedPrice = new BigDecimal(proposedPriceText); // Convert to BigDecimal
-        } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Invalid Input");
-            alert.setHeaderText("Invalid Proposed Price");
-            alert.setContentText("Please enter a valid number for the proposed price.");
-            alert.showAndWait();
-            return;
-        }
+    BigDecimal proposedPrice;
+    try {
+        proposedPrice = new BigDecimal(proposedPriceText); // Convert to BigDecimal
+    } catch (NumberFormatException e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Invalid Input");
+        alert.setHeaderText("Invalid Proposed Price");
+        alert.setContentText("Please enter a valid number for the proposed price.");
+        alert.showAndWait();
+        return;
+    }
 
-        // SQL query to insert a new quote
-        String insertQuery = "INSERT INTO quote (user_id, quote_title, client_id, quote_price, quote_start_date, " +
-                "quote_deadline, quote_payment_terms, quote_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    // SQL query to insert a new quote and retrieve the generated quote_id
+    String insertQuery = "INSERT INTO quote (user_id, quote_title, client_id, quote_price, quote_start_date, " +
+            "quote_deadline, quote_payment_terms, quote_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    String selectQuery = "SELECT LAST_INSERT_ID() AS quote_id";
 
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+    try (Connection connection = DatabaseHandler.getConnection();
+         PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+         PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
 
-            // Set query parameters
-            preparedStatement.setInt(1, userId); // User ID
-            preparedStatement.setString(2, titleText); // Quote Title
-            preparedStatement.setInt(3, selectedClient.getId()); // Client ID
-            preparedStatement.setBigDecimal(4, proposedPrice); // Quote Price
-            preparedStatement.setDate(5, java.sql.Date.valueOf(startDate.toString())); // Start Date
-            preparedStatement.setDate(6, java.sql.Date.valueOf(deadlineDate.toString())); // Deadline
-            preparedStatement.setString(7, paymentTermsSelection.toString()); // Payment Terms
-            preparedStatement.setString(8, statusSelection.toString()); // Status
+        // Set query parameters
+        insertStatement.setInt(1, userId); // User ID
+        insertStatement.setString(2, titleText); // Quote Title
+        insertStatement.setInt(3, selectedClient.getId()); // Client ID
+        insertStatement.setBigDecimal(4, proposedPrice); // Quote Price
+        insertStatement.setDate(5, java.sql.Date.valueOf(startDate.toString())); // Start Date
+        insertStatement.setDate(6, java.sql.Date.valueOf(deadlineDate.toString())); // Deadline
+        insertStatement.setString(7, paymentTermsSelection.toString()); // Payment Terms
+        insertStatement.setString(8, statusSelection.toString()); // Status
 
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected == 1) {
+        int rowsAffected = insertStatement.executeUpdate();
+        if (rowsAffected == 1) {
+            ResultSet resultSet = selectStatement.executeQuery();
+            if (resultSet.next()) {
+                int quoteId = resultSet.getInt("quote_id");
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
                 alert.setHeaderText("Quote Created");
                 alert.setContentText("The new quote has been successfully added.");
                 alert.showAndWait();
+
+                // Generate the text file
+                generateQuoteTextFile(quoteId, titleText, proposedPrice, startDate.toString(), deadlineDate.toString(), selectedClient.getName(), paymentTermsSelection.toString());
 
                 if (allquotesController != null) {
                     allquotesController.loadQuoteData();
@@ -189,23 +201,57 @@ public class NewQuoteController {
                 // Close the window after success
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.close();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Failed to Create Quote");
-                alert.setContentText("An error occurred while adding the quote. Please try again.");
-                alert.showAndWait();
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
+            alert.setTitle("Error");
             alert.setHeaderText("Failed to Create Quote");
-            alert.setContentText("An error occurred while connecting to the database: " + e.getMessage());
+            alert.setContentText("An error occurred while adding the quote. Please try again.");
             alert.showAndWait();
         }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Database Error");
+        alert.setHeaderText("Failed to Create Quote");
+        alert.setContentText("An error occurred while connecting to the database: " + e.getMessage());
+        alert.showAndWait();
     }
+}
+
+private void generateQuoteTextFile(int quoteId, String title, BigDecimal price, String startDate, String deadline, String clientName, String paymentTerms) {
+    String termsAndAgreement = """
+        TERMS AND AGREEMENT FOR THE COMMISSION
+
+        1. The client agrees to the proposed price and payment terms.
+        2. The client agrees to the start date and deadline.
+        3. The client agrees to provide necessary information and resources for the project.
+        4. The client agrees to the terms of service as outlined in the application.
+        """;
+
+    String content = String.format("""
+        Quote Title: %s
+        Quote Price: %s
+        Start Date: %s
+        Deadline: %s
+        Client Name: %s
+        Payment Terms: %s
+
+        %s
+        """, title, price, startDate, deadline, clientName, paymentTerms, termsAndAgreement);
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(quoteId + "_quote.txt"))) {
+        writer.write(content);
+    } catch (IOException e) {
+        e.printStackTrace();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("File Error");
+        alert.setHeaderText("Failed to Generate Quote File");
+        alert.setContentText("An error occurred while generating the quote file: " + e.getMessage());
+        alert.showAndWait();
+    }
+}
 
 
     public void CancelClicked(MouseEvent event) {

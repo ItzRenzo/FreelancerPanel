@@ -6,6 +6,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -204,6 +208,10 @@ public class EditInvoiceController {
                 if (invoiceController != null) {
                     invoiceController.loadInvoiceData();
                 }
+
+                // Update the text file with the new invoice details
+                editInvoiceTextFile(invoiceId, userId, selectedClient.getId(), new BigDecimal(totalValue), paymentMethod, deadline.toString(), title, memo, status);
+
                 closeWindow(event);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to update invoice.");
@@ -214,6 +222,32 @@ public class EditInvoiceController {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to update invoice: " + e.getMessage());
         }
     }
+
+private void editInvoiceTextFile(int invoiceId, int userId, int clientId, BigDecimal amount, String paymentMethod, String dueDate, String title, String memo, String status) {
+    StringBuilder content = new StringBuilder(String.format("""
+        User ID: %d
+        Client ID: %d
+        Invoice Amount: %s
+        Payment Method: %s
+        Due Date: %s
+        Title: %s
+        Memo: %s
+        """, userId, clientId, amount, paymentMethod, dueDate, title, memo));
+
+    if ("Paid".equals(status)) {
+        content.append(String.format("""
+            Invoice Status: %s
+            Invoice Paid At: %s
+            """, status, java.time.LocalDate.now().toString()));
+    }
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(invoiceId + "_invoice.txt"))) {
+        writer.write(content.toString());
+    } catch (IOException e) {
+        e.printStackTrace();
+        showAlert(Alert.AlertType.ERROR, "File Error", "Failed to Edit Invoice File: " + e.getMessage());
+    }
+}
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
