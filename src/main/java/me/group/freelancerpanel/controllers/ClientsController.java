@@ -290,8 +290,24 @@ public class ClientsController {
     public void loadClientData() {
         ObservableList<Client> clientList = FXCollections.observableArrayList();
 
-        String query = "SELECT client_id, client_name, client_email, client_discord, client_total_commission, client_total_revenue, client_since " +
-                "FROM client WHERE user_id = ?";
+        String query = """
+        SELECT 
+            c.client_id,
+            c.client_name,
+            c.client_email,
+            c.client_discord,
+            COUNT(cm.commission_id) AS client_total_commission,
+            COALESCE(SUM(cm.commission_total_paid), 0) AS client_total_revenue,
+            c.client_since
+        FROM 
+            client c
+        LEFT JOIN 
+            commission cm ON c.client_id = cm.client_id
+        WHERE 
+            c.user_id = ?
+        GROUP BY 
+            c.client_id, c.client_name, c.client_email, c.client_discord, c.client_since
+    """;
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -304,8 +320,8 @@ public class ClientsController {
                 String name = resultSet.getString("client_name");
                 String email = resultSet.getString("client_email");
                 String discord = resultSet.getString("client_discord");
-                int totalCommission = resultSet.getInt("client_total_commission");
-                double totalRevenue = resultSet.getDouble("client_total_revenue");
+                int totalCommission = resultSet.getInt("client_total_commission"); // Total commissions related to the client
+                double totalRevenue = resultSet.getDouble("client_total_revenue"); // Total amount paid by the client
                 String since = resultSet.getString("client_since");
 
                 clientList.add(new Client(id, name, email, discord, totalCommission, totalRevenue, since));
