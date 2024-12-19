@@ -1,3 +1,11 @@
+/* Center-align content in all table cells */
+.table-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: white; /* Default text color */
+    -fx-alignment: CENTER; /* Center-align the content */
+}
+
 /* Make the entire TableView background transparent */
 .table-view {
     -fx-background-color: transparent;
